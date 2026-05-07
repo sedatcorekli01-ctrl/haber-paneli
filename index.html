@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Türkiye ve Dünya gündemini takip edebileceğiniz modern haber ve ekonomi paneli.">
+    <title>Master Panel | Gündem & Ekonomi</title>
+    <style>
+        :root {
+            --bg: #020617;
+            --card: #1e293b;
+            --accent: #38bdf8;
+            --text: #f8fafc;
+            --gold: #fbbf24;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 600px; width: 100%; }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .header h1 { margin: 0; font-size: 1.8rem; color: var(--accent); }
+        .header p { color: #94a3b8; font-size: 0.9rem; }
+
+        /* Ekonomi Kartları */
+        .eco-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .eco-item {
+            background: var(--card);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+        .eco-label { font-size: 0.7rem; color: var(--accent); font-weight: bold; }
+        .eco-val { display: block; font-size: 1rem; margin-top: 5px; font-weight: bold; }
+
+        /* Haber Kartları */
+        .news-section h2 { font-size: 1.2rem; border-left: 4px solid var(--accent); padding-left: 10px; margin-bottom: 15px; }
+        .news-card {
+            background: var(--card);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 12px;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+        .news-card:hover { border-color: var(--accent); background: #334155; }
+        .news-time { font-size: 0.7rem; color: #94a3b8; }
+        .news-title { font-size: 1rem; margin-top: 5px; line-height: 1.4; }
+
+        .btn-update {
+            width: 100%;
+            background: var(--accent);
+            color: #020617;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>MERKEZİ PANEL</h1>
+        <p id="date-display"></p>
+    </div>
+
+    <div class="eco-grid">
+        <div class="eco-item"><span class="eco-label">DOLAR</span><span id="usd" class="eco-val">...</span></div>
+        <div class="eco-item"><span class="eco-label">EURO</span><span id="eur" class="eco-val">...</span></div>
+        <div class="eco-item"><span class="eco-label">BITCOIN</span><span id="btc" class="eco-val">...</span></div>
+    </div>
+
+    <button class="btn-update" onclick="tümVerileriGuncelle()">VERİLERİ GÜNCELLE</button>
+
+    <div class="news-section">
+        <h2>Son Dakika Haberler</h2>
+        <div id="news-feed">Haberler yükleniyor...</div>
+    </div>
+</div>
+
+<script>
+    async function tümVerileriGuncelle() {
+        const newsFeed = document.getElementById('news-feed');
+        
+        // 1. Saat ve Tarih
+        const simdi = new Date();
+        document.getElementById('date-display').innerText = simdi.toLocaleString('tr-TR');
+
+        // 2. Ekonomi Verileri (Canlı)
+        try {
+            const ecoRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+            const ecoData = await ecoRes.json();
+            document.getElementById('usd').innerText = ecoData.rates.TRY.toFixed(2) + " ₺";
+            document.getElementById('eur').innerText = (ecoData.rates.TRY / ecoData.rates.EUR).toFixed(2) + " ₺";
+            
+            const btcRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+            const btcData = await btcRes.json();
+            document.getElementById('btc').innerText = "$" + btcData.bitcoin.usd.toLocaleString();
+        } catch (e) { console.error("Ekonomi hatası"); }
+
+        // 3. Haberler (Canlı Google News TR)
+        try {
+            const rssUrl = encodeURIComponent('https://news.google.com/rss?hl=tr&gl=TR&ceid=TR:tr');
+            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
+            const data = await res.json();
+            
+            newsFeed.innerHTML = "";
+            data.items.slice(0, 10).forEach(item => {
+                newsFeed.innerHTML += `
+                    <a href="${item.link}" target="_blank" class="news-card">
+                        <span class="news-time">${item.pubDate}</span>
+                        <div class="news-title">${item.title}</div>
+                    </a>
+                `;
+            });
+        } catch (e) { newsFeed.innerHTML = "Haberler şu an yüklenemedi."; }
+    }
+
+    window.onload = tümVerileriGuncelle;
+</script>
+
+</body>
+</html>
