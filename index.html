@@ -39,16 +39,14 @@
             width: 100%; background: var(--accent); color: #020617;
             border: none; padding: 18px; border-radius: 12px;
             font-weight: 800; cursor: pointer; margin-bottom: 25px;
-            transition: 0.3s;
         }
-        .btn-update:active { transform: scale(0.95); }
 
         .news-card {
             background: var(--card); padding: 15px; border-radius: 12px;
             margin-bottom: 10px; display: block; text-decoration: none;
             color: inherit; border: 1px solid #1e293b;
         }
-        .news-title { font-size: 1rem; font-weight: 500; }
+        .news-title { font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -68,7 +66,7 @@
 
     <button class="btn-update" onclick="location.reload()">SİSTEMİ GÜNCELLE</button>
 
-    <div id="news-feed">Haberler yükleniyor...</div>
+    <div id="news-feed">Haberler taranıyor...</div>
 </div>
 
 <script>
@@ -96,8 +94,14 @@
             const data = await res.json();
             if(data.status === 'ok') {
                 newsFeed.innerHTML = "";
-                data.items.slice(0, 15).forEach(item => {
-                    newsFeed.innerHTML += `<a href="${item.link}" target="_blank" class="news-card"><div class="news-title">${item.title}</div></a>`;
+                const basliklar = new Set(); // Aynı haberleri engellemek için set kullanıyoruz
+                
+                data.items.forEach(item => {
+                    // Eğer başlık daha önce eklenmediyse ve 15 habere ulaşmadıysak ekle
+                    if(!basliklar.has(item.title) && basliklar.size < 15) {
+                        basliklar.add(item.title);
+                        newsFeed.innerHTML += `<a href="${item.link}" target="_blank" class="news-card"><div class="news-title">${item.title}</div></a>`;
+                    }
                 });
             }
         } catch (e) { newsFeed.innerHTML = "Şu an haber çekilemiyor."; }
