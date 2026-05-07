@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Insight | App</title>
     <style>
-        :root { --bg: #020617; --card: #0f172a; --accent: #38bdf8; --gold: #fbbf24; --text: #f1f5f9; }
+        :root { --bg: #020617; --card: #0f172a; --accent: #38bdf8; --gold: #fbbf24; --text: #f1f5f9; --sozcu: #e11d48; --karma: #6366f1; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .container { max-width: 600px; width: 100%; }
         .header { text-align: center; padding: 20px 0; }
@@ -19,7 +19,9 @@
         .btn-update { width: 100%; background: var(--accent); color: #020617; border: none; padding: 18px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 25px; transition: 0.3s; }
         .news-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: block; text-decoration: none; color: inherit; border: 1px solid #1e293b; }
         .news-title { font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
-        .source-tag { font-size: 0.65rem; color: var(--accent); font-weight: bold; text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .tag { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; display: inline-block; padding: 2px 6px; border-radius: 4px; }
+        .tag-sozcu { background: var(--sozcu); color: white; }
+        .tag-karma { background: var(--karma); color: white; }
     </style>
 </head>
 <body>
@@ -46,6 +48,7 @@
 
     async function verileriGetir() {
         const newsFeed = document.getElementById('news-feed');
+        
         try {
             const ecoRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
             const ecoData = await ecoRes.json();
@@ -56,32 +59,45 @@
             const btcData = await btcRes.json();
             document.getElementById('gold-gram').innerText = ((btcData['pax-gold'].usd / 31.1035) * tryRate).toFixed(2) + " ₺";
             document.getElementById('btc').innerText = "$" + btcData.bitcoin.usd.toLocaleString();
-        } catch (e) { console.log("Ekonomi hatası"); }
+        } catch (e) { console.log("Hata"); }
 
         try {
-            // Show Haber ve Diğer Popüler Kaynakları Karıştıran Sistem
-            const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml');
-            const data = await res.json();
+            // SÖZCÜ Çekimi
+            const resSozcu = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika');
+            const dataSozcu = await resSozcu.json();
             
-            if(data.status === 'ok') {
-                newsFeed.innerHTML = "";
-                const basliklar = new Set();
-                let count = 0;
+            // KARMA Çekim (HaberTürk/Show & Milliyet Karışımı)
+            const resKarma = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml');
+            const dataKarma = await resKarma.json();
 
-                data.items.forEach(item => {
-                    // Aynı başlıkları engelle ve sadece ilk 12 haber
-                    if(!basliklar.has(item.title) && count < 12) {
-                        basliklar.add(item.title);
-                        newsFeed.innerHTML += `
-                            <a href="${item.link}" target="_blank" class="news-card">
-                                <span class="source-tag">SON DAKİKA</span>
-                                <div class="news-title">${item.title}</div>
-                            </a>`;
-                        count++;
-                    }
+            newsFeed.innerHTML = "";
+            let htmlContent = "";
+
+            // 10 Tane SÖZCÜ
+            if(dataSozcu.status === 'ok') {
+                dataSozcu.items.slice(0, 10).forEach(item => {
+                    htmlContent += `
+                        <a href="${item.link}" target="_blank" class="news-card">
+                            <span class="tag tag-sozcu">SÖZCÜ HABER</span>
+                            <div class="news-title">${item.title}</div>
+                        </a>`;
                 });
             }
-        } catch (e) { newsFeed.innerHTML = "Haber akışı şu an yüklenemedi."; }
+
+            // 10 Tane KARMA (Show Haber ve Diğerleri)
+            if(dataKarma.status === 'ok') {
+                dataKarma.items.slice(0, 10).forEach(item => {
+                    htmlContent += `
+                        <a href="${item.link}" target="_blank" class="news-card">
+                            <span class="tag tag-karma">SON DAKİKA</span>
+                            <div class="news-title">${item.title}</div>
+                        </a>`;
+                });
+            }
+            
+            newsFeed.innerHTML = htmlContent;
+
+        } catch (e) { newsFeed.innerHTML = "Bağlantı hatası."; }
     }
 
     window.onload = () => { verileriGetir(); setInterval(saatiGuncelle, 1000); };
