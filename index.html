@@ -37,14 +37,16 @@
 
         .btn-update {
             width: 100%; background: var(--accent); color: #020617;
-            border: none; padding: 15px; border-radius: 12px;
+            border: none; padding: 18px; border-radius: 12px;
             font-weight: 800; cursor: pointer; margin-bottom: 25px;
+            transition: 0.3s;
         }
+        .btn-update:active { transform: scale(0.95); }
 
         .news-card {
             background: var(--card); padding: 15px; border-radius: 12px;
             margin-bottom: 10px; display: block; text-decoration: none;
-            color: inherit; border: 1px solid #1e293b; line-height: 1.4;
+            color: inherit; border: 1px solid #1e293b;
         }
         .news-title { font-size: 1rem; font-weight: 500; }
     </style>
@@ -64,9 +66,9 @@
         <div class="eco-item"><span class="eco-label">BITCOIN</span><span id="btc" class="eco-val">...</span></div>
     </div>
 
-    <button class="btn-update" onclick="tümVerileriGuncelle()">SİSTEMİ GÜNCELLE</button>
+    <button class="btn-update" onclick="location.reload()">SİSTEMİ GÜNCELLE</button>
 
-    <div id="news-feed">Haberler taranıyor...</div>
+    <div id="news-feed">Haberler yükleniyor...</div>
 </div>
 
 <script>
@@ -74,10 +76,8 @@
         document.getElementById('date-display').innerText = new Date().toLocaleString('tr-TR');
     }
 
-    async function tümVerileriGuncelle() {
+    async function verileriGetir() {
         const newsFeed = document.getElementById('news-feed');
-        
-        // Ekonomi Verileri
         try {
             const ecoRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
             const ecoData = await ecoRes.json();
@@ -89,23 +89,22 @@
             const btcData = await btcRes.json();
             document.getElementById('gold-gram').innerText = ((btcData['pax-gold'].usd / 31.1035) * tryRate).toFixed(2) + " ₺";
             document.getElementById('btc').innerText = "$" + btcData.bitcoin.usd.toLocaleString();
-        } catch (e) { console.log("Finans hatası"); }
+        } catch (e) { console.log("Hata"); }
 
-        // Yeni Nesil Haber Çekici
         try {
             const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.ntv.com.tr%2Fson-dakika.rss');
             const data = await res.json();
             if(data.status === 'ok') {
                 newsFeed.innerHTML = "";
-                data.items.slice(0, 12).forEach(item => {
+                data.items.slice(0, 15).forEach(item => {
                     newsFeed.innerHTML += `<a href="${item.link}" target="_blank" class="news-card"><div class="news-title">${item.title}</div></a>`;
                 });
             }
-        } catch (e) { newsFeed.innerHTML = "Haberler şu an yüklenemedi. Lütfen butona tekrar basın."; }
+        } catch (e) { newsFeed.innerHTML = "Şu an haber çekilemiyor."; }
     }
 
     window.onload = () => {
-        tümVerileriGuncelle();
+        verileriGetir();
         setInterval(saatiGuncelle, 1000);
     };
 </script>
