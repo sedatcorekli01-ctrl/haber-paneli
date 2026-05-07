@@ -5,35 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Insight | App</title>
     <style>
-        :root { --bg: #020617; --card: #0f172a; --accent: #38bdf8; --gold: #fbbf24; --text: #f1f5f9; --sozcu: #e11d48; --karma: #6366f1; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        /* Ana Değişkenler (Karanlık Mod Varsayılan) */
+        :root { 
+            --bg: #020617; --card: #0f172a; --accent: #38bdf8; --gold: #fbbf24; 
+            --text: #f1f5f9; --sozcu: #e11d48; --karma: #6366f1; --border: #1e293b;
+        }
+
+        /* Aydınlık Mod Değişkenleri */
+        .light-mode {
+            --bg: #f8fafc; --card: #ffffff; --accent: #0284c7; --gold: #b45309; 
+            --text: #0f172a; --border: #e2e8f0;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); 
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
+            transition: 0.3s; /* Renk geçişi yumuşak olsun */
+        }
+        
         .container { max-width: 600px; width: 100%; }
-        .header { text-align: center; padding: 15px 0; }
+        
+        /* Mod Değiştirme Butonu */
+        .mode-toggle {
+            position: fixed; top: 15px; right: 15px; background: var(--card);
+            border: 1px solid var(--accent); color: var(--accent);
+            padding: 8px 12px; border-radius: 50%; cursor: pointer; z-index: 100;
+            font-size: 1.2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header { text-align: center; padding: 15px 0; margin-top: 20px; }
         .header h1 { margin: 0; font-size: 1.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
         
-        /* Hava Durumu Arama Kutusu */
-        .weather-section { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #38bdf8; text-align: center; }
-        .weather-search { display: flex; gap: 8px; margin-bottom: 10px; }
-        .weather-search input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #334155; color: white; outline: none; }
-        .weather-search button { background: var(--accent); border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        #weather-info { font-size: 0.9rem; font-weight: 500; }
-        #weather-temp { font-size: 1.5rem; font-weight: bold; color: var(--accent); margin: 5px 0; }
+        .weather-section { 
+            background: var(--card); padding: 20px; border-radius: 15px; 
+            margin-bottom: 20px; border: 1px solid var(--accent); text-align: center; 
+        }
+        .weather-search { display: flex; gap: 8px; margin-bottom: 15px; }
+        .weather-search input { 
+            flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); 
+            background: var(--bg); color: var(--text); outline: none; 
+        }
+        .weather-search button { 
+            background: var(--accent); border: none; padding: 10px 20px; 
+            border-radius: 10px; font-weight: 800; cursor: pointer; color: white; 
+        }
+        #weather-temp { font-size: 2.2rem; font-weight: 900; color: var(--accent); margin: 5px 0; }
 
         .eco-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-        .eco-item { background: var(--card); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #1e293b; }
-        .eco-label { font-size: 0.7rem; color: #94a3b8; font-weight: bold; }
+        .eco-item { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
+        .eco-label { font-size: 0.7rem; color: #64748b; font-weight: bold; }
         .eco-val { display: block; font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
         .gold-text { color: var(--gold); }
         
-        .btn-update { width: 100%; background: var(--accent); color: #020617; border: none; padding: 18px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
-        .news-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: block; text-decoration: none; color: inherit; border: 1px solid #1e293b; }
-        .news-title { font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
-        .tag { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; display: inline-block; padding: 2px 6px; border-radius: 4px; }
+        .btn-update { 
+            width: 100%; background: var(--accent); color: white; border: none; 
+            padding: 18px; border-radius: 12px; font-weight: 800; cursor: pointer; 
+            margin-bottom: 25px; 
+        }
+        
+        .news-card { 
+            background: var(--card); padding: 15px; border-radius: 12px; 
+            margin-bottom: 10px; display: block; text-decoration: none; 
+            color: inherit; border: 1px solid var(--border); 
+        }
+        .tag { 
+            font-size: 0.65rem; font-weight: bold; text-transform: uppercase; 
+            margin-bottom: 6px; display: inline-block; padding: 2px 8px; border-radius: 4px; 
+        }
         .tag-sozcu { background: var(--sozcu); color: white; }
         .tag-karma { background: var(--karma); color: white; }
     </style>
 </head>
 <body>
+
+<button class="mode-toggle" onclick="temaDegistir()" id="theme-btn">☀️</button>
 
 <div class="container">
     <div class="header">
@@ -42,12 +87,12 @@
 
     <div class="weather-section">
         <div class="weather-search">
-            <input type="text" id="city-input" placeholder="Şehir ara (Örn: Burdur)">
+            <input type="text" id="city-input" placeholder="Şehir ismini yazın...">
             <button onclick="havaDurumuAra()">ARA</button>
         </div>
-        <div id="weather-info">Yükleniyor...</div>
+        <div id="weather-info">Hava durumu yükleniyor...</div>
         <div id="weather-temp">--°C</div>
-        <div id="weather-city" style="font-size: 0.8rem; color: #94a3b8;">Burdur, Türkiye</div>
+        <div id="weather-city">BURDUR</div>
     </div>
 
     <div class="eco-grid">
@@ -62,23 +107,31 @@
 </div>
 
 <script>
+    // Tema Değiştirme Fonksiyonu
+    function temaDegistir() {
+        const body = document.body;
+        const btn = document.getElementById('theme-btn');
+        body.classList.toggle('light-mode');
+        
+        if (body.classList.contains('light-mode')) {
+            btn.innerText = "🌙"; // Aydınlık moddayken ay göster
+        } else {
+            btn.innerText = "☀️"; // Karanlık moddayken güneş göster
+        }
+    }
+
     async function havaDurumuGetir(sehir = 'Burdur') {
         const info = document.getElementById('weather-info');
         const temp = document.getElementById('weather-temp');
         const cityDisplay = document.getElementById('weather-city');
-        
         try {
-            // Ücretsiz bir hava durumu servisi kullanıyoruz
             const res = await fetch(`https://api.wttr.in/${sehir}?format=j1`);
             const data = await res.json();
             const current = data.current_condition[0];
-            
             temp.innerText = current.temp_C + "°C";
             info.innerText = current.lang_tr ? current.lang_tr[0].value : current.weatherDesc[0].value;
             cityDisplay.innerText = sehir.toUpperCase();
-        } catch (e) {
-            info.innerText = "Şehir bulunamadı!";
-        }
+        } catch (e) { info.innerText = "Şehir bulunamadı!"; }
     }
 
     function havaDurumuAra() {
@@ -87,20 +140,17 @@
     }
 
     async function verileriGetir() {
-        // Ekonomi
         try {
             const ecoRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
             const ecoData = await ecoRes.json();
             document.getElementById('usd').innerText = ecoData.rates.TRY.toFixed(2) + " ₺";
             document.getElementById('eur').innerText = (ecoData.rates.TRY / ecoData.rates.EUR).toFixed(2) + " ₺";
-            
             const btcRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd');
             const btcData = await btcRes.json();
             document.getElementById('gold-gram').innerText = ((btcData['pax-gold'].usd / 31.1035) * ecoData.rates.TRY).toFixed(2) + " ₺";
             document.getElementById('btc').innerText = "$" + btcData.bitcoin.usd.toLocaleString();
         } catch (e) {}
 
-        // Haberler (Sözcü & Karma)
         try {
             const newsFeed = document.getElementById('news-feed');
             const resSozcu = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika');
@@ -123,10 +173,7 @@
         } catch (e) {}
     }
 
-    window.onload = () => {
-        havaDurumuGetir(); // Başlangıçta Burdur'u getir
-        verileriGetir();
-    };
+    window.onload = () => { havaDurumuGetir(); verileriGetir(); };
 </script>
 
 </body>
