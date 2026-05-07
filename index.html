@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Canlı ekonomi ve haber takip paneli.">
-    <title>Master Panel | Pro</title>
+    <title>Global Insight | Haber & Ekonomi</title>
     <style>
         :root {
             --bg: #020617;
-            --card: #1e293b;
+            --card: #0f172a;
             --accent: #38bdf8;
-            --text: #f8fafc;
+            --gold: #fbbf24;
+            --text: #f1f5f9;
         }
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
@@ -23,122 +23,118 @@
             align-items: center;
         }
         .container { max-width: 600px; width: 100%; }
-        .header { text-align: center; padding: 20px 0; }
-        .header h1 { margin: 0; font-size: 1.8rem; color: var(--accent); }
-        #date-display { color: #94a3b8; font-family: monospace; font-size: 1.1rem; margin-top: 10px; }
+        .header { text-align: center; padding: 25px 0; border-bottom: 1px solid #1e293b; margin-bottom: 20px; }
+        .header h1 { margin: 0; font-size: 1.6rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; }
+        #date-display { color: #64748b; font-family: monospace; font-size: 1rem; margin-top: 8px; }
 
         .eco-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
             margin-bottom: 20px;
         }
         .eco-item {
             background: var(--card);
-            padding: 12px;
+            padding: 15px;
             border-radius: 12px;
             text-align: center;
-            border: 1px solid #334155;
+            border: 1px solid #1e293b;
         }
-        .eco-label { font-size: 0.7rem; color: var(--accent); font-weight: bold; }
-        .eco-val { display: block; font-size: 1rem; margin-top: 5px; font-weight: bold; }
-
-        .news-section h2 { font-size: 1.2rem; border-left: 4px solid var(--accent); padding-left: 10px; margin-bottom: 15px; }
-        .news-card {
-            background: var(--card);
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 12px;
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            border: 1px solid transparent;
-            transition: 0.3s;
-        }
-        .news-card:hover { border-color: var(--accent); background: #334155; }
-        .news-title { font-size: 1rem; line-height: 1.4; }
+        .eco-label { font-size: 0.75rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+        .eco-val { display: block; font-size: 1.1rem; margin-top: 5px; font-weight: 700; color: #f8fafc; }
+        .gold-text { color: var(--gold) !important; }
 
         .btn-update {
             width: 100%;
             background: var(--accent);
             color: #020617;
             border: none;
-            padding: 15px;
+            padding: 16px;
             border-radius: 12px;
-            font-weight: bold;
+            font-weight: 800;
             font-size: 1rem;
             cursor: pointer;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
         }
+
+        .news-card {
+            background: var(--card);
+            padding: 18px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid #1e293b;
+        }
+        .news-title { font-size: 1.05rem; line-height: 1.5; font-weight: 500; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>MERKEZİ PANEL</h1>
-        <div id="date-display">Yükleniyor...</div>
+        <h1>GLOBAL INSIGHT</h1>
+        <div id="date-display">YÜKLENİYOR...</div>
     </div>
 
     <div class="eco-grid">
-        <div class="eco-item"><span class="eco-label">DOLAR</span><span id="usd" class="eco-val">...</span></div>
-        <div class="eco-item"><span class="eco-label">EURO</span><span id="eur" class="eco-val">...</span></div>
+        <div class="eco-item"><span class="eco-label">USD/TRY</span><span id="usd" class="eco-val">...</span></div>
+        <div class="eco-item"><span class="eco-label">EUR/TRY</span><span id="eur" class="eco-val">...</span></div>
+        <div class="eco-item"><span class="eco-label">GRAM ALTIN</span><span id="gold-gram" class="eco-val gold-text">...</span></div>
         <div class="eco-item"><span class="eco-label">BITCOIN</span><span id="btc" class="eco-val">...</span></div>
     </div>
 
-    <button class="btn-update" onclick="tümVerileriGuncelle()">VERİLERİ TAZELE</button>
+    <button class="btn-update" onclick="tümVerileriGuncelle()">Sistemi Güncelle</button>
 
     <div class="news-section">
-        <h2>Son Dakika Haberler</h2>
-        <div id="news-feed">Haberler getiriliyor...</div>
+        <div id="news-feed">Haberler taranıyor...</div>
     </div>
 </div>
 
 <script>
-    // 1. Saniyelerin akması için fonksiyon
     function saatiGuncelle() {
         const simdi = new Date();
         document.getElementById('date-display').innerText = simdi.toLocaleString('tr-TR');
     }
 
-    // 2. Ekonomi ve Haberleri çeken fonksiyon
     async function tümVerileriGuncelle() {
         const newsFeed = document.getElementById('news-feed');
         
-        // Ekonomi
         try {
             const ecoRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
             const ecoData = await ecoRes.json();
-            document.getElementById('usd').innerText = ecoData.rates.TRY.toFixed(2) + " ₺";
-            document.getElementById('eur').innerText = (ecoData.rates.TRY / ecoData.rates.EUR).toFixed(2) + " ₺";
+            const tryRate = ecoData.rates.TRY;
             
+            document.getElementById('usd').innerText = tryRate.toFixed(2) + " ₺";
+            document.getElementById('eur').innerText = (tryRate / ecoData.rates.EUR).toFixed(2) + " ₺";
+            
+            const goldRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd');
+            const goldData = await goldRes.json();
+            const gramGold = (goldData['pax-gold'].usd / 31.1035) * tryRate;
+            document.getElementById('gold-gram').innerText = gramGold.toFixed(2) + " ₺";
+
             const btcRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
             const btcData = await btcRes.json();
             document.getElementById('btc').innerText = "$" + btcData.bitcoin.usd.toLocaleString();
-        } catch (e) { console.error("Veri hatası"); }
+        } catch (e) { console.error("Hata oluştu"); }
 
-        // Haberler (TRT Haber RSS)
         try {
-            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.trthaber.com%2Fmanset_articles.rss`);
+            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberler.com%2Frss.asp`);
             const data = await res.json();
-            
             if(data.status === 'ok') {
                 newsFeed.innerHTML = "";
-                data.items.slice(0, 10).forEach(item => {
-                    newsFeed.innerHTML += `
-                        <a href="${item.link}" target="_blank" class="news-card">
-                            <div class="news-title">${item.title}</div>
-                        </a>
-                    `;
+                data.items.slice(0, 15).forEach(item => {
+                    newsFeed.innerHTML += `<a href="${item.link}" target="_blank" class="news-card"><div class="news-title">${item.title}</div></a>`;
                 });
             }
-        } catch (e) { newsFeed.innerHTML = "Haber akışı şu an meşgul."; }
+        } catch (e) { newsFeed.innerHTML = "Bağlantı hatası."; }
     }
 
-    // Sayfa açıldığında her şeyi başlat
     window.onload = () => {
         tümVerileriGuncelle();
-        setInterval(saatiGuncelle, 1000); // Saniyeyi her saniye yürüt
+        setInterval(saatiGuncelle, 1000);
     };
 </script>
 
