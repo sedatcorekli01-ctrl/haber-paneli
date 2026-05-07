@@ -13,7 +13,7 @@
             --text: #f1f5f9;
         }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
@@ -67,7 +67,9 @@
             text-decoration: none;
             color: inherit;
             border: 1px solid #1e293b;
+            transition: 0.2s;
         }
+        .news-card:hover { border-color: var(--accent); }
         .news-title { font-size: 1.05rem; line-height: 1.5; font-weight: 500; }
     </style>
 </head>
@@ -76,7 +78,7 @@
 <div class="container">
     <div class="header">
         <h1>GLOBAL INSIGHT</h1>
-        <div id="date-display">YÜKLENİYOR...</div>
+        <div id="date-display">SİSTEM BAŞLATILIYOR...</div>
     </div>
 
     <div class="eco-grid">
@@ -89,7 +91,7 @@
     <button class="btn-update" onclick="tümVerileriGuncelle()">Sistemi Güncelle</button>
 
     <div class="news-section">
-        <div id="news-feed">Haberler taranıyor...</div>
+        <div id="news-feed">Haberler hazırlanıyor...</div>
     </div>
 </div>
 
@@ -101,6 +103,7 @@
 
     async function tümVerileriGuncelle() {
         const newsFeed = document.getElementById('news-feed');
+        newsFeed.innerHTML = "Haber akışı taranıyor...";
         
         try {
             const ecoRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
@@ -118,18 +121,22 @@
             const btcRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
             const btcData = await btcRes.json();
             document.getElementById('btc').innerText = "$" + btcData.bitcoin.usd.toLocaleString();
-        } catch (e) { console.error("Hata oluştu"); }
+        } catch (e) { console.error("Finans hatası"); }
 
         try {
-            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberler.com%2Frss.asp`);
+            // En hızlı ve takılmayan haber kaynağına geçtik (Ensonhaber)
+            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.ensonhaber.com%2Frss%2Fensonhaber.xml`);
             const data = await res.json();
             if(data.status === 'ok') {
                 newsFeed.innerHTML = "";
                 data.items.slice(0, 15).forEach(item => {
-                    newsFeed.innerHTML += `<a href="${item.link}" target="_blank" class="news-card"><div class="news-title">${item.title}</div></a>`;
+                    newsFeed.innerHTML += `
+                        <a href="${item.link}" target="_blank" class="news-card">
+                            <div class="news-title">${item.title}</div>
+                        </a>`;
                 });
             }
-        } catch (e) { newsFeed.innerHTML = "Bağlantı hatası."; }
+        } catch (e) { newsFeed.innerHTML = "Haberler şu an yüklenemedi, butona tekrar basın."; }
     }
 
     window.onload = () => {
