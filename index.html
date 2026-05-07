@@ -67,9 +67,7 @@
             text-decoration: none;
             color: inherit;
             border: 1px solid #1e293b;
-            transition: 0.2s;
         }
-        .news-card:hover { border-color: var(--accent); }
         .news-title { font-size: 1.05rem; line-height: 1.5; font-weight: 500; }
     </style>
 </head>
@@ -78,7 +76,7 @@
 <div class="container">
     <div class="header">
         <h1>GLOBAL INSIGHT</h1>
-        <div id="date-display">SİSTEM BAŞLATILIYOR...</div>
+        <div id="date-display">BAŞLATILIYOR...</div>
     </div>
 
     <div class="eco-grid">
@@ -91,7 +89,7 @@
     <button class="btn-update" onclick="tümVerileriGuncelle()">Sistemi Güncelle</button>
 
     <div class="news-section">
-        <div id="news-feed">Haberler hazırlanıyor...</div>
+        <div id="news-feed">Haberler yükleniyor...</div>
     </div>
 </div>
 
@@ -103,40 +101,40 @@
 
     async function tümVerileriGuncelle() {
         const newsFeed = document.getElementById('news-feed');
-        newsFeed.innerHTML = "Haber akışı taranıyor...";
         
+        // Finans Verileri
         try {
             const ecoRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
             const ecoData = await ecoRes.json();
             const tryRate = ecoData.rates.TRY;
-            
             document.getElementById('usd').innerText = tryRate.toFixed(2) + " ₺";
             document.getElementById('eur').innerText = (tryRate / ecoData.rates.EUR).toFixed(2) + " ₺";
             
-            const goldRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd');
-            const goldData = await goldRes.json();
-            const gramGold = (goldData['pax-gold'].usd / 31.1035) * tryRate;
-            document.getElementById('gold-gram').innerText = gramGold.toFixed(2) + " ₺";
-
-            const btcRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+            const btcRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd');
             const btcData = await btcRes.json();
+            const gramGold = (btcData['pax-gold'].usd / 31.1035) * tryRate;
+            document.getElementById('gold-gram').innerText = gramGold.toFixed(2) + " ₺";
             document.getElementById('btc').innerText = "$" + btcData.bitcoin.usd.toLocaleString();
-        } catch (e) { console.error("Finans hatası"); }
+        } catch (e) { console.error("Finans Hatası"); }
 
+        // Haberler (Hızlı ve Farklı Bir Yöntem)
         try {
-            // En hızlı ve takılmayan haber kaynağına geçtik (Ensonhaber)
-            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.ensonhaber.com%2Frss%2Fensonhaber.xml`);
-            const data = await res.json();
-            if(data.status === 'ok') {
-                newsFeed.innerHTML = "";
-                data.items.slice(0, 15).forEach(item => {
-                    newsFeed.innerHTML += `
-                        <a href="${item.link}" target="_blank" class="news-card">
-                            <div class="news-title">${item.title}</div>
-                        </a>`;
-                });
+            // Haberler.com yerine daha açık bir servis deniyoruz
+            const res = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.ensonhaber.com/rss/ensonhaber.xml'));
+            const responseData = await res.json();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(responseData.contents, "text/xml");
+            const items = xmlDoc.querySelectorAll("item");
+            
+            newsFeed.innerHTML = "";
+            for(let i=0; i<15 && i<items.length; i++) {
+                const title = items[i].querySelector("title").textContent;
+                const link = items[i].querySelector("link").textContent;
+                newsFeed.innerHTML += `<a href="${link}" target="_blank" class="news-card"><div class="news-title">${title}</div></a>`;
             }
-        } catch (e) { newsFeed.innerHTML = "Haberler şu an yüklenemedi, butona tekrar basın."; }
+        } catch (e) { 
+            newsFeed.innerHTML = "Haber servisi meşgul. Lütfen 5 saniye sonra 'Sistemi Güncelle' butonuna tekrar basın."; 
+        }
     }
 
     window.onload = () => {
