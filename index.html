@@ -3,122 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Insight | Full App</title>
+    <title>Global Insight | App</title>
     <style>
         :root { 
             --bg: #020617; --card: #0f172a; --accent: #38bdf8; --gold: #fbbf24; 
             --text: #f1f5f9; --sozcu: #e11d48; --karma: #6366f1; --border: #1e293b;
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        
-        .search-box { display: flex; gap: 8px; margin: 20px 0; }
+        .container { max-width: 600px; margin: 0 auto; width: 100%; }
+        .header { text-align: center; padding: 15px 0; margin-bottom: 10px; }
+        .header h1 { margin: 0; font-size: 1.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
+        .search-box { display: flex; gap: 8px; margin-bottom: 20px; }
         .search-box input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); outline: none; }
         .search-box button { padding: 12px 20px; border-radius: 10px; border: none; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
-
         .weather-section { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--accent); text-align: center; }
         #weather-temp { font-size: 2.2rem; font-weight: 900; color: var(--accent); margin: 5px 0; }
-
         .eco-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
         .eco-item { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
         .eco-label { font-size: 0.7rem; color: #64748b; font-weight: bold; text-transform: uppercase; }
         .eco-val { display: block; font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
-        
         .status-note { font-size: 0.65rem; margin-top: 8px; font-weight: 700; display: block; text-transform: uppercase; }
         .up { color: #10b981; } .down { color: #ef4444; } .stable { color: #94a3b8; }
-
         .btn-update { width: 100%; background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 25px; }
-        
-        /* Haber Kartları */
         .news-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: block; text-decoration: none; color: inherit; border: 1px solid var(--border); }
-        .news-title { font-size: 0.9rem; line-height: 1.4; }
-        .tag { font-size: 0.6rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; margin-bottom: 5px; display: inline-block; color: white; }
+        .tag { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; display: inline-block; padding: 2px 8px; border-radius: 4px; color: #fff; }
         .tag-sozcu { background: var(--sozcu); }
-        .tag-son { background: var(--karma); }
+        .tag-ht { background: var(--karma); }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="header"><h1>GLOBAL INSIGHT</h1></div>
     <div class="search-box">
-        <input type="text" id="city-input" placeholder="Şehir girin">
+        <input type="text" id="city-input" placeholder="Şehir girin...">
         <button onclick="havaDurumuGuncelle()">ARA</button>
     </div>
-
     <div class="weather-section">
         <div id="weather-info">Yükleniyor...</div>
         <div id="weather-temp">--°C</div>
         <div id="weather-city">BURDUR</div>
     </div>
-
     <div class="eco-grid">
-        <div class="eco-item">
-            <span class="eco-label">USD/TRY</span>
-            <span id="usd" class="eco-val">...</span>
-            <span id="usd-note" class="status-note">Analiz...</span>
-        </div>
-        <div class="eco-item">
-            <span class="eco-label">EUR/TRY</span>
-            <span id="eur" class="eco-val">...</span>
-            <span id="eur-note" class="status-note">Analiz...</span>
-        </div>
-        <div class="eco-item" style="border: 1px solid var(--gold);">
-            <span class="eco-label" style="color:var(--gold)">Gram Altın</span>
-            <span id="gold-gram" class="eco-val" style="color:var(--gold)">...</span>
-            <span id="gold-note" class="status-note">Analiz...</span>
-        </div>
-        <div class="eco-item">
-            <span class="eco-label">Bitcoin</span>
-            <span id="btc" class="eco-val">...</span>
-            <span id="btc-note" class="status-note">Analiz...</span>
-        </div>
+        <div class="eco-item"><span class="eco-label">USD/TRY</span><span id="usd" class="eco-val">...</span><span id="usd-note" class="status-note">Analiz...</span></div>
+        <div class="eco-item"><span class="eco-label">EUR/TRY</span><span id="eur" class="eco-val">...</span><span id="eur-note" class="status-note">Analiz...</span></div>
+        <div class="eco-item" style="border: 1px solid var(--gold);"><span class="eco-label" style="color:var(--gold)">Gram Altın</span><span id="gold-gram" class="eco-val" style="color:var(--gold)">...</span><span id="gold-note" class="status-note">Analiz...</span></div>
+        <div class="eco-item"><span class="eco-label">Bitcoin</span><span id="btc" class="eco-val">...</span><span id="btc-note" class="status-note">Analiz...</span></div>
     </div>
-
     <button class="btn-update" onclick="location.reload()">SİSTEMİ GÜNCELLE</button>
-
     <div id="news-feed">Haberler hazırlanıyor...</div>
 </div>
 
 <script>
-    async function verileriGetir() {
+    async function verileriBaslat() {
+        ekonomiGetir();
+        havaDurumuGuncelle();
+        haberleriGetir();
+    }
+
+    async function ekonomiGetir() {
         try {
-            // 1. Piyasa Verileri (Fiyatlar)
             const ecoRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
             const ecoData = await ecoRes.json();
             const tryRate = ecoData.rates.TRY;
             document.getElementById('usd').innerText = tryRate.toFixed(2) + " ₺";
             document.getElementById('eur').innerText = (tryRate / ecoData.rates.EUR).toFixed(2) + " ₺";
 
-            // 2. Analiz Verileri (Değişim Oranları)
             const coinRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold,tether,stasis-eurs&vs_currencies=usd&include_24hr_change=true');
             const coinData = await coinRes.json();
 
-            // Bitcoin ve Altın
             document.getElementById('btc').innerText = "$" + coinData.bitcoin.usd.toLocaleString();
-            updateStatus('btc-note', coinData.bitcoin.usd_24h_change, "Yükselişte", "Düşüşte");
-            
-            const gramAltin = (coinData['pax-gold'].usd / 31.1035) * tryRate;
-            document.getElementById('gold-gram').innerText = gramAltin.toFixed(2) + " ₺";
-            updateStatus('gold-note', coinData['pax-gold'].usd_24h_change, "Değerleniyor", "Düşüşte");
+            updateNote('btc-note', coinData.bitcoin.usd_24h_change, "Yükselişte", "Düşüşte");
 
-            // Dolar ve Euro Analizi (Stabil coin hareketlerine göre otomatik)
-            updateStatus('usd-note', coinData.tether.usd_24h_change + 0.01, "Yükseliyor", "Sakinleşti");
-            updateStatus('eur-note', coinData['stasis-eurs'].usd_24h_change, "Hareketli", "Düşüşte");
+            const gAltin = (coinData['pax-gold'].usd / 31.1035) * tryRate;
+            document.getElementById('gold-gram').innerText = gAltin.toFixed(2) + " ₺";
+            updateNote('gold-note', coinData['pax-gold'].usd_24h_change, "Değerleniyor", "Düşüşte");
 
-            // 3. Hava Durumu
-            await havaDurumuGuncelle();
-
-            // 4. HABERLER (Geri Geldi!)
-            await haberleriGetir();
-
-        } catch (e) { console.log("Hata!"); }
+            updateNote('usd-note', coinData.tether.usd_24h_change + 0.01, "Yükseliyor", "Sakin");
+            updateNote('eur-note', coinData['stasis-eurs'].usd_24h_change, "Hareketli", "Düşüşte");
+        } catch (e) { }
     }
 
-    function updateStatus(id, change, upMsg, downMsg) {
+    function updateNote(id, change, up, down) {
         const el = document.getElementById(id);
-        if (change > 0.02) { el.innerText = "▲ " + upMsg; el.className = "status-note up"; }
-        else if (change < -0.02) { el.innerText = "▼ " + downMsg; el.className = "status-note down"; }
-        else { el.innerText = "● STABİL SEYİR"; el.className = "status-note stable"; }
+        if(change > 0.02) { el.innerText = "▲ " + up; el.className = "status-note up"; }
+        else if(change < -0.02) { el.innerText = "▼ " + down; el.className = "status-note down"; }
+        else { el.innerText = "● STABİL"; el.className = "status-note stable"; }
     }
 
     async function havaDurumuGuncelle() {
@@ -129,33 +99,59 @@
             document.getElementById('weather-temp').innerText = data.current_condition[0].temp_C + "°C";
             document.getElementById('weather-info').innerText = data.current_condition[0].lang_tr[0].value;
             document.getElementById('weather-city').innerText = city.toUpperCase();
-        } catch (e) {}
+        } catch (e) { }
     }
 
     async function haberleriGetir() {
-        const newsFeed = document.getElementById('news-feed');
+        const feed = document.getElementById('news-feed');
         try {
-            const resSozcu = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika');
-            const dataSozcu = await resSozcu.json();
-            const resHT = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml');
-            const dataHT = await resHT.json();
+            const [s1, s2] = await Promise.all([
+                fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika').then(r => r.json()),
+                fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml').then(r => r.json())
+            ]);
+
+            let titles = new Set();
+            let finalNews = [];
+
+            // Sözcü'den ilk 10 benzersiz haberi al
+            let sCount = 0;
+            if(s1.items) {
+                for(let item of s1.items) {
+                    let clean = item.title.trim().toLowerCase().substring(0, 35);
+                    if(!titles.has(clean) && sCount < 10) {
+                        titles.add(clean);
+                        finalNews.push({...item, src: 'SÖZCÜ', tag: 'tag-sozcu'});
+                        sCount++;
+                    }
+                }
+            }
+
+            // Habertürk'ten ilk 10 benzersiz haberi al
+            let hCount = 0;
+            if(s2.items) {
+                for(let item of s2.items) {
+                    let clean = item.title.trim().toLowerCase().substring(0, 35);
+                    if(!titles.has(clean) && hCount < 10) {
+                        titles.add(clean);
+                        finalNews.push({...item, src: 'HABERTÜRK', tag: 'tag-ht'});
+                        hCount++;
+                    }
+                }
+            }
 
             let html = "";
-            if(dataSozcu.items) {
-                dataSozcu.items.slice(0, 8).forEach(item => {
-                    html += `<a href="${item.link}" target="_blank" class="news-card"><span class="tag tag-sozcu">SÖZCÜ</span><div class="news-title">${item.title}</div></a>`;
-                });
-            }
-            if(dataHT.items) {
-                dataHT.items.slice(0, 8).forEach(item => {
-                    html += `<a href="${item.link}" target="_blank" class="news-card"><span class="tag tag-son">SON DAKİKA</span><div class="news-title">${item.title}</div></a>`;
-                });
-            }
-            newsFeed.innerHTML = html;
-        } catch (e) { newsFeed.innerText = "Haberler yüklenemedi."; }
+            finalNews.forEach(i => {
+                html += `
+                <a href="${i.link}" target="_blank" class="news-card">
+                    <span class="tag ${i.tag}">${i.src}</span>
+                    <div style="font-size:0.95rem; font-weight:500;">${i.title}</div>
+                </a>`;
+            });
+            feed.innerHTML = html;
+        } catch (e) { feed.innerText = "Haber yükleme hatası."; }
     }
 
-    window.onload = verileriGetir;
+    window.onload = verileriBaslat;
 </script>
 </body>
-    </html>
+</html>
