@@ -1,135 +1,28 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Insight | Haber Merkezi</title>
-    <style>
-        :root { 
-            --bg: #020617; --card: #0f172a; --accent: #38bdf8; --gold: #fbbf24; 
-            --text: #f1f5f9; --sozcu: #e11d48; --karma: #6366f1; --border: #1e293b;
-        }
-        .light-mode {
-            --bg: #f8fafc; --card: #ffffff; --accent: #0284c7; --gold: #b45309; 
-            --text: #0f172a; --border: #e2e8f0;
-        }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; transition: 0.3s; }
-        .container { max-width: 600px; margin: 0 auto; width: 100%; }
-        .mode-toggle { position: fixed; top: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); color: var(--accent); padding: 8px 12px; border-radius: 50%; cursor: pointer; z-index: 100; }
-        .header { text-align: center; padding: 15px 0; margin-top: 20px; }
-        .header h1 { margin: 0; font-size: 1.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 5px; }
-        
-        .weather-section { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--accent); text-align: center; }
-        #weather-temp { font-size: 2.2rem; font-weight: 900; color: var(--accent); margin: 5px 0; }
+function sesliSunum() {
+    const usd = document.getElementById('usd').innerText.replace('₺', 'lira');
+    const altin = document.getElementById('q-gold').innerText.replace('₺', 'lira');
+    const hava = document.getElementById('weather-temp').innerText.replace('°C', 'derece');
+    const durum = document.getElementById('weather-info').innerText;
 
-        .eco-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-        .eco-item { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
-        .eco-label { font-size: 0.65rem; color: #64748b; font-weight: bold; text-transform: uppercase; }
-        .eco-val { display: block; font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
-        .gold-text { color: var(--gold); }
-        
-        .btn-speak { width: 100%; background: #0ea5e9; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); }
-        .btn-update { width: 100%; background: var(--card); color: var(--accent); border: 1px solid var(--accent); padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-bottom: 25px; }
-        
-        .news-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: block; text-decoration: none; color: inherit; border: 1px solid var(--border); border-left: 4px solid var(--accent); }
-        .news-title { font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
-        .tag { font-size: 0.6rem; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; display: inline-block; padding: 2px 6px; border-radius: 4px; }
-        .tag-sozcu { background: var(--sozcu); color: white; }
-        .tag-karma { background: var(--karma); color: white; }
-    </style>
-</head>
-<body>
+    const metin = `Sayın izleyenler, Global Insight ekonomi bültenine hoş geldiniz. Bugün Burdur'da hava sıcaklığı ${hava} ve gökyüzü ${durum}. Piyasalardaki son rakamlar ise şöyle: Dolar ${usd} seviyesinden işlem görürken, çeyrek altın fiyatı ${altin} olarak kaydedildi. Haber bültenimizi dinlediğiniz için teşekkür ederiz.`;
 
-<button class="mode-toggle" onclick="temaDegistir()" id="theme-btn">☀️</button>
-
-<div class="container">
-    <div class="header"><h1>GLOBAL INSIGHT</h1></div>
-
-    <div class="weather-section">
-        <div id="weather-info">Yükleniyor...</div>
-        <div id="weather-temp">--°C</div>
-        <div id="weather-city">Burdur</div>
-    </div>
-
-    <div class="eco-grid">
-        <div class="eco-item"><span class="eco-label">Dolar/TL</span><span id="usd" class="eco-val">...</span></div>
-        <div class="eco-item"><span class="eco-label">Euro/TL</span><span id="eur" class="eco-val">...</span></div>
-        <div class="eco-item" style="border: 1px solid var(--gold);"><span class="eco-label gold-text">Çeyrek Altın</span><span id="q-gold" class="eco-val gold-text">...</span></div>
-        <div class="eco-item"><span class="eco-label">Gram Altın</span><span id="gold-gram" class="eco-val">...</span></div>
-        <div class="eco-item" style="grid-column: span 2;"><span class="eco-label">Bitcoin (Anlık)</span><span id="btc" class="eco-val" style="color:#10b981; font-size: 0.9rem;">...</span></div>
-    </div>
-
-    <button class="btn-speak" onclick="sesliSunum()">
-        <span>🎙️</span> GÜNLÜK ÖZETİ DİNLE
-    </button>
-    <button class="btn-update" onclick="location.reload()">VERİLERİ YENİLE</button>
-
-    <div id="news-feed">Haberler hazırlanıyor...</div>
-</div>
-
-<script>
-    function temaDegistir() {
-        const body = document.body;
-        const btn = document.getElementById('theme-btn');
-        body.classList.toggle('light-mode');
-        btn.innerText = body.classList.contains('light-mode') ? "🌙" : "☀️";
+    const ses = new SpeechSynthesisUtterance();
+    ses.text = metin;
+    
+    // TÜRKÇE SESİ ZORLA BULMA SİSTEMİ
+    const voices = window.speechSynthesis.getVoices();
+    const trVoice = voices.find(voice => voice.lang === 'tr-TR' || voice.lang.includes('tr'));
+    
+    if (trVoice) {
+        ses.voice = trVoice;
     }
+    
+    ses.lang = 'tr-TR';
+    ses.rate = 1.0; 
+    window.speechSynthesis.speak(ses);
+}
 
-    // Haber Sunucusu Modu (Resmi Dil)
-    function sesliSunum() {
-        const usd = document.getElementById('usd').innerText.replace('₺', 'lira');
-        const altin = document.getElementById('q-gold').innerText.replace('₺', 'lira');
-        const hava = document.getElementById('weather-temp').innerText.replace('°C', 'derece');
-        const durum = document.getElementById('weather-info').innerText;
-
-        const metin = `Sayın dinleyiciler, Global Insight ekonomi bültenine hoş geldiniz. Bugün hava sıcaklığı ${hava} ve gökyüzü ${durum}. Piyasalardaki son rakamlar ise şöyle: Dolar ${usd} seviyesinden işlem görürken, çeyrek altın fiyatı ${altin} olarak kaydedildi. Haber bültenimizi dinlediğiniz için teşekkür ederiz.`;
-
-        const ses = new SpeechSynthesisUtterance();
-        ses.text = metin;
-        ses.lang = 'tr-TR';
-        ses.rate = 1.0; 
-        window.speechSynthesis.speak(ses);
-    }
-
-    async function verileriGetir() {
-        try {
-            const ecoRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-            const ecoData = await ecoRes.json();
-            const tryRate = ecoData.rates.TRY;
-            document.getElementById('usd').innerText = tryRate.toFixed(2) + " ₺";
-            document.getElementById('eur').innerText = (tryRate / ecoData.rates.EUR).toFixed(2) + " ₺";
-            
-            const crypRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd');
-            const crypData = await crypRes.json();
-            const gramAltin = (crypData['pax-gold'].usd / 31.1035) * tryRate;
-            document.getElementById('gold-gram').innerText = gramAltin.toFixed(2) + " ₺";
-            document.getElementById('q-gold').innerText = (gramAltin * 1.63).toFixed(0) + " ₺";
-            document.getElementById('btc').innerText = "BTC: $" + crypData.bitcoin.usd.toLocaleString();
-
-            const resW = await fetch(`https://api.wttr.in/Burdur?format=j1`);
-            const dataW = await resW.json();
-            document.getElementById('weather-temp').innerText = dataW.current_condition[0].temp_C + "°C";
-            document.getElementById('weather-info').innerText = dataW.current_condition[0].lang_tr[0].value;
-
-            const newsFeed = document.getElementById('news-feed');
-            const [resS, resH] = await Promise.all([
-                fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika'),
-                fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml')
-            ]);
-            const [dataS, dataH] = await Promise.all([resS.json(), resH.json()]);
-
-            let html = "";
-            if(dataS.items) dataS.items.slice(0, 10).forEach(i => {
-                html += `<a href="${i.link}" target="_blank" class="news-card"><span class="tag tag-sozcu">SÖZCÜ</span><div class="news-title">${i.title}</div></a>`;
-            });
-            if(dataH.items) dataH.items.slice(0, 10).forEach(i => {
-                html += `<a href="${i.link}" target="_blank" class="news-card"><span class="tag tag-karma">SON DAKİKA</span><div class="news-title">${i.title}</div></a>`;
-            });
-            newsFeed.innerHTML = html;
-        } catch (e) { }
-    }
-
-    window.onload = verileriGetir;
-</script>
-</body>
-</html>
+// Seslerin yüklenmesi için tarayıcıya süre tanıyan ekleme
+window.speechSynthesis.onvoiceschanged = () => {
+    window.speechSynthesis.getVoices();
+};
