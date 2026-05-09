@@ -15,12 +15,19 @@
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; transition: 0.3s; }
         .container { max-width: 600px; margin: 0 auto; width: 100%; }
+        
         .mode-toggle { position: fixed; top: 15px; right: 15px; background: var(--card); border: 1px solid var(--accent); color: var(--accent); padding: 8px 12px; border-radius: 50%; cursor: pointer; z-index: 100; font-size: 1.2rem; }
+        
         .header { text-align: center; padding: 15px 0; margin-top: 20px; }
         .header h1 { margin: 0; font-size: 1.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
         
+        /* Hava Durumu Bölümü */
         .weather-section { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--accent); text-align: center; }
-        #weather-temp { font-size: 2.2rem; font-weight: 900; color: var(--accent); margin: 5px 0; }
+        #weather-temp { font-size: 2.5rem; font-weight: 900; color: var(--accent); margin: 5px 0; }
+        #city-select { 
+            background: var(--bg); color: var(--text); border: 1px solid var(--border); 
+            padding: 8px 15px; border-radius: 8px; font-size: 1rem; cursor: pointer; outline: none; margin-bottom: 10px;
+        }
 
         .eco-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
         .eco-item { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
@@ -28,9 +35,11 @@
         .eco-val { display: block; font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
         .gold-text { color: var(--gold); }
         
-        .btn-update { width: 100%; background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 25px; }
+        .btn-update { width: 100%; background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 25px; transition: 0.2s; }
+        .btn-update:active { transform: scale(0.98); opacity: 0.9; }
         
-        .news-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: block; text-decoration: none; color: inherit; border: 1px solid var(--border); }
+        .news-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: block; text-decoration: none; color: inherit; border: 1px solid var(--border); transition: 0.2s; }
+        .news-card:hover { border-color: var(--accent); }
         .news-title { font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
         .tag { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; display: inline-block; padding: 2px 8px; border-radius: 4px; }
         .tag-sozcu { background: var(--sozcu); color: white; }
@@ -45,9 +54,18 @@
     <div class="header"><h1>GLOBAL INSIGHT</h1></div>
 
     <div class="weather-section">
+        <select id="city-select" onchange="verileriGetir()">
+            <option value="Burdur">Burdur</option>
+            <option value="Istanbul">İstanbul</option>
+            <option value="Ankara">Ankara</option>
+            <option value="Izmir">İzmir</option>
+            <option value="Antalya">Antalya</option>
+            <option value="Bursa">Bursa</option>
+            <option value="Adana">Adana</option>
+            <option value="Trabzon">Trabzon</option>
+        </select>
         <div id="weather-info">Hava durumu yükleniyor...</div>
         <div id="weather-temp">--°C</div>
-        <div id="weather-city">BURDUR</div>
     </div>
 
     <div class="eco-grid">
@@ -58,7 +76,7 @@
         <div class="eco-item" style="grid-column: span 2;"><span class="eco-label">Bitcoin</span><span id="btc" class="eco-val" style="color:#10b981">...</span></div>
     </div>
 
-    <button class="btn-update" onclick="location.reload()">SİSTEMİ GÜNCELLE</button>
+    <button class="btn-update" onclick="verileriGetir()">VERİLERİ TAZELE</button>
 
     <div id="news-feed">Haberler hazırlanıyor...</div>
 </div>
@@ -72,14 +90,17 @@
     }
 
     async function verileriGetir() {
+        const city = document.getElementById('city-select').value;
+        
         try {
-            // Ekonomi Verileri
+            // 1. Ekonomi Verileri (Döviz)
             const ecoRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
             const ecoData = await ecoRes.json();
             const tryRate = ecoData.rates.TRY;
             document.getElementById('usd').innerText = tryRate.toFixed(2) + " ₺";
             document.getElementById('eur').innerText = (tryRate / ecoData.rates.EUR).toFixed(2) + " ₺";
             
+            // 2. Kripto ve Altın (CoinGecko PAXG üzerinden Gram Altın hesaplama)
             const crypRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd');
             const crypData = await crypRes.json();
             const gramAltin = (crypData['pax-gold'].usd / 31.1035) * tryRate;
@@ -87,36 +108,43 @@
             document.getElementById('q-gold').innerText = (gramAltin * 1.63).toFixed(0) + " ₺";
             document.getElementById('btc').innerText = "$" + crypData.bitcoin.usd.toLocaleString();
 
-            // Hava Durumu
-            const resWeather = await fetch(`https://api.wttr.in/Burdur?format=j1`);
+            // 3. Hava Durumu (wttr.in dinamik şehir)
+            const resWeather = await fetch(`https://api.wttr.in/${city}?format=j1`);
             const dataWeather = await resWeather.json();
             document.getElementById('weather-temp').innerText = dataWeather.current_condition[0].temp_C + "°C";
-            document.getElementById('weather-info').innerText = dataWeather.current_condition[0].lang_tr[0].value;
+            const weatherDesc = dataWeather.current_condition[0].lang_tr 
+                ? dataWeather.current_condition[0].lang_tr[0].value 
+                : dataWeather.current_condition[0].weatherDesc[0].value;
+            document.getElementById('weather-info').innerText = weatherDesc.toUpperCase();
 
-            // 20 Haberlik Karma Liste
+            // 4. Haberler (Karma Liste)
             const newsFeed = document.getElementById('news-feed');
             const resSozcu = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika');
             const dataSozcu = await resSozcu.json();
-            const resShow = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml');
-            const dataShow = await resShow.json();
+            const resHT = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml');
+            const dataHT = await resHT.json();
 
             let htmlContent = "";
             if(dataSozcu.status === 'ok') {
-                dataSozcu.items.slice(0, 10).forEach(item => {
+                dataSozcu.items.slice(0, 8).forEach(item => {
                     htmlContent += `<a href="${item.link}" target="_blank" class="news-card"><span class="tag tag-sozcu">SÖZCÜ</span><div class="news-title">${item.title}</div></a>`;
                 });
             }
-            if(dataShow.status === 'ok') {
-                dataShow.items.slice(0, 10).forEach(item => {
-                    htmlContent += `<a href="${item.link}" target="_blank" class="news-card"><span class="tag tag-karma">SON DAKİKA</span><div class="news-title">${item.title}</div></a>`;
+            if(dataHT.status === 'ok') {
+                dataHT.items.slice(0, 8).forEach(item => {
+                    htmlContent += `<a href="${item.link}" target="_blank" class="news-card"><span class="tag tag-karma">HABERTÜRK</span><div class="news-title">${item.title}</div></a>`;
                 });
             }
             newsFeed.innerHTML = htmlContent;
 
-        } catch (e) { console.log("Hata!"); }
+        } catch (e) { 
+            console.error("Veri çekme hatası:", e);
+            document.getElementById('weather-info').innerText = "Bağlantı Hatası!";
+        }
     }
 
+    // Uygulama açıldığında verileri çek
     window.onload = verileriGetir;
 </script>
 </body>
-</html>
+    </html>
