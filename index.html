@@ -9,21 +9,41 @@
             --bg: #020617; --card: #0f172a; --accent: #38bdf8; --gold: #fbbf24; 
             --text: #f1f5f9; --sozcu: #e11d48; --karma: #6366f1; --border: #1e293b;
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; }
-        .container { max-width: 600px; margin: 0 auto; width: 100%; }
+        
+        /* Gündüz Modu Renkleri */
+        body.light-mode {
+            --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --border: #e2e8f0;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; transition: 0.3s; }
+        .container { max-width: 600px; margin: 0 auto; width: 100%; position: relative; }
+        
+        /* Mod Butonu */
+        .theme-toggle {
+            position: absolute; right: 0; top: 15px;
+            background: var(--card); border: 1px solid var(--border);
+            padding: 8px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
         .header { text-align: center; padding: 15px 0; margin-bottom: 10px; }
         .header h1 { margin: 0; font-size: 1.6rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
+        
         .search-box { display: flex; gap: 8px; margin-bottom: 20px; }
         .search-box input { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); outline: none; }
         .search-box button { padding: 12px 20px; border-radius: 10px; border: none; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
+        
         .weather-section { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--accent); text-align: center; }
         #weather-temp { font-size: 2.2rem; font-weight: 900; color: var(--accent); margin: 5px 0; }
+        
         .eco-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
         .eco-item { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
         .eco-label { font-size: 0.7rem; color: #64748b; font-weight: bold; text-transform: uppercase; }
         .eco-val { display: block; font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
         .status-note { font-size: 0.65rem; margin-top: 8px; font-weight: 700; display: block; text-transform: uppercase; }
+        
         .up { color: #10b981; } .down { color: #ef4444; } .stable { color: #94a3b8; }
+        
         .btn-update { width: 100%; background: var(--accent); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 25px; }
         .news-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: block; text-decoration: none; color: inherit; border: 1px solid var(--border); }
         .tag { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; display: inline-block; padding: 2px 8px; border-radius: 4px; color: #fff; }
@@ -31,30 +51,57 @@
         .tag-ht { background: var(--karma); }
     </style>
 </head>
-<body>
+<body class="dark-mode">
 
 <div class="container">
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
     <div class="header"><h1>GLOBAL INSIGHT</h1></div>
+    
     <div class="search-box">
         <input type="text" id="city-input" placeholder="Şehir girin...">
         <button onclick="havaDurumuGuncelle()">ARA</button>
     </div>
+    
     <div class="weather-section">
         <div id="weather-info">Yükleniyor...</div>
         <div id="weather-temp">--°C</div>
         <div id="weather-city">BURDUR</div>
     </div>
+
     <div class="eco-grid">
         <div class="eco-item"><span class="eco-label">USD/TRY</span><span id="usd" class="eco-val">...</span><span id="usd-note" class="status-note">Analiz...</span></div>
         <div class="eco-item"><span class="eco-label">EUR/TRY</span><span id="eur" class="eco-val">...</span><span id="eur-note" class="status-note">Analiz...</span></div>
         <div class="eco-item" style="border: 1px solid var(--gold);"><span class="eco-label" style="color:var(--gold)">Gram Altın</span><span id="gold-gram" class="eco-val" style="color:var(--gold)">...</span><span id="gold-note" class="status-note">Analiz...</span></div>
-        <div class="eco-item"><span class="eco-label">Bitcoin</span><span id="btc" class="eco-val">...</span><span id="btc-note" class="status-note">Analiz...</span></div>
+        <div class="eco-item" style="border: 1px solid var(--gold);"><span class="eco-label" style="color:var(--gold)">Çeyrek Altın</span><span id="q-gold" class="eco-val" style="color:var(--gold)">...</span><span id="q-note" class="status-note">Analiz...</span></div>
+        <div class="eco-item" style="grid-column: span 2;"><span class="eco-label">Bitcoin</span><span id="btc" class="eco-val" style="color:#10b981">...</span><span id="btc-note" class="status-note">Analiz...</span></div>
     </div>
-    <button class="btn-update" onclick="location.reload()">SİSTEMİ GÜNCELLE</button>
+
+    <button class="btn-update" onclick="location.reload()">SİSTEMİ TAZELE</button>
     <div id="news-feed">Haberler hazırlanıyor...</div>
 </div>
 
 <script>
+    // TEMA KONTROLÜ
+    function toggleTheme() {
+        const body = document.body;
+        const btn = document.getElementById('theme-btn');
+        body.classList.toggle('light-mode');
+        
+        if(body.classList.contains('light-mode')) {
+            btn.innerText = "☀️";
+            localStorage.setItem('theme', 'light');
+        } else {
+            btn.innerText = "🌙";
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    // Kayıtlı temayı yükle
+    if(localStorage.getItem('theme') === 'light') {
+        document.body.classList.add('light-mode');
+        document.getElementById('theme-btn').innerText = "☀️";
+    }
+
     async function verileriBaslat() {
         ekonomiGetir();
         havaDurumuGuncelle();
@@ -77,9 +124,12 @@
 
             const gAltin = (coinData['pax-gold'].usd / 31.1035) * tryRate;
             document.getElementById('gold-gram').innerText = gAltin.toFixed(2) + " ₺";
+            document.getElementById('q-gold').innerText = (gAltin * 1.63 + 50).toFixed(0) + " ₺";
+            
             updateNote('gold-note', coinData['pax-gold'].usd_24h_change, "Değerleniyor", "Düşüşte");
+            updateNote('q-note', coinData['pax-gold'].usd_24h_change, "Yükseliyor", "Düşüşte");
 
-            updateNote('usd-note', coinData.tether.usd_24h_change + 0.01, "Yükseliyor", "Sakin");
+            updateNote('usd-note', coinData.tether.usd_24h_change + 0.01, "Yükseliyor", "Düşüşte");
             updateNote('eur-note', coinData['stasis-eurs'].usd_24h_change, "Hareketli", "Düşüşte");
         } catch (e) { }
     }
@@ -109,11 +159,8 @@
                 fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika').then(r => r.json()),
                 fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml').then(r => r.json())
             ]);
-
             let titles = new Set();
             let finalNews = [];
-
-            // Sözcü'den ilk 10 benzersiz haberi al
             let sCount = 0;
             if(s1.items) {
                 for(let item of s1.items) {
@@ -125,8 +172,6 @@
                     }
                 }
             }
-
-            // Habertürk'ten ilk 10 benzersiz haberi al
             let hCount = 0;
             if(s2.items) {
                 for(let item of s2.items) {
@@ -138,14 +183,9 @@
                     }
                 }
             }
-
             let html = "";
             finalNews.forEach(i => {
-                html += `
-                <a href="${i.link}" target="_blank" class="news-card">
-                    <span class="tag ${i.tag}">${i.src}</span>
-                    <div style="font-size:0.95rem; font-weight:500;">${i.title}</div>
-                </a>`;
+                html += `<a href="${i.link}" target="_blank" class="news-card"><span class="tag ${i.tag}">${i.src}</span><div style="font-size:0.95rem; font-weight:500;">${i.title}</div></a>`;
             });
             feed.innerHTML = html;
         } catch (e) { feed.innerText = "Haber yükleme hatası."; }
