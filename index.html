@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Insight</title>
+    
+    <title>Global Insight | Sedat ÇÖREKLİ</title>
+    <meta name="description" content="Sedat ÇÖREKLİ tarafından geliştirilen; anlık ekonomi, döviz ve son dakika haber paneli.">
+    <meta name="keywords" content="Sedat ÇÖREKLİ, haber paneli, ekonomi, Burdur hava durumu, dolar kuru">
+    <meta name="author" content="Sedat ÇÖREKLİ">
+    <link rel="canonical" href="https://sedatcorekli01-ctrl.github.io/haber-paneli/">
+
     <style>
         :root {
             --bg: #0a0e1a;
             --card: #151c2c;
             --accent: #38bdf8;
-            --gold: #fbbf24;
             --text: #f1f5f9;
             --border: #1e293b;
         }
@@ -17,7 +22,6 @@
             --bg: #f8fafc;
             --card: #ffffff;
             --accent: #0284c7;
-            --gold: #b45309;
             --text: #0f172a;
             --border: #e2e8f0;
         }
@@ -32,36 +36,27 @@
         .container { max-width: 500px; margin: 0 auto; }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .header h1 { font-size: 1.4rem; color: var(--accent); letter-spacing: 2px; margin: 0; }
+        .header h1 { font-size: 1.4rem; color: var(--accent); letter-spacing: 2px; margin: 0; font-weight: 800; }
         
-        #theme-btn { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--text); padding: 5px; }
-
-        .search-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); outline: none; }
-        .search-btn { background: var(--accent); border: none; border-radius: 10px; padding: 0 20px; color: #0a0e1a; font-weight: bold; cursor: pointer; }
+        #theme-btn { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--text); }
 
         .weather-card { background: var(--card); border: 1px solid var(--accent); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; }
-        .weather-temp { font-size: 3rem; font-weight: bold; color: var(--accent); margin: 10px 0; }
+        .weather-temp { font-size: 3.5rem; font-weight: bold; color: var(--accent); margin: 10px 0; }
         
         .eco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .eco-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; }
+        
         .label { font-size: 0.65rem; color: #64748b; font-weight: bold; display: block; margin-bottom: 5px; text-transform: uppercase; }
         .value { font-size: 1.2rem; font-weight: bold; display: block; }
         .status { font-size: 0.65rem; font-weight: bold; margin-top: 8px; display: block; }
-
-        .btc-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
-
-        .service-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .service-btn { background: #38bdf820; border: 1px solid var(--accent); color: var(--accent); padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; }
 
         .update-btn { width: 100%; background: var(--accent); color: #0a0e1a; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; }
         
         .news-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; text-decoration: none; display: block; color: inherit; }
         .news-tag { background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; margin-right: 8px; }
 
-        /* SEDAT ÇÖREKLİ İMZA STİLİ */
-        .footer { text-align: center; padding: 30px 0 10px 0; border-top: 1px solid var(--border); margin-top: 20px; }
-        .signature { font-size: 0.8rem; letter-spacing: 3px; font-weight: 900; color: var(--accent); text-transform: uppercase; opacity: 0.7; }
+        .footer { text-align: center; padding: 40px 0 20px 0; border-top: 1px solid var(--border); margin-top: 20px; }
+        .signature { font-size: 1rem; letter-spacing: 3px; font-weight: 900; color: var(--accent); text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -72,29 +67,13 @@
         <button id="theme-btn" onclick="temaDegistir()">🌙</button>
     </div>
 
-    <div class="search-container">
-        <input type="text" id="city-input" class="search-input" placeholder="Şehir..." value="BURDUR">
-        <button class="search-btn" onclick="verileriGetir()">ARA</button>
-    </div>
-
     <div class="weather-card">
-        <div id="weather-desc">Analiz Ediliyor...</div>
+        <div id="weather-desc" style="color: #64748b;">Veriler alınıyor...</div>
         <div class="weather-temp" id="temp">--°C</div>
-        <div style="font-weight: bold; letter-spacing: 1px;" id="city-name">BURDUR</div>
+        <div style="font-weight: bold; letter-spacing: 2px;" id="city-name">BURDUR</div>
     </div>
 
-    <div class="eco-grid" id="eco-section"></div>
-
-    <div class="btc-card">
-        <span class="label">BITCOIN (BTC)</span>
-        <span class="value" style="color: #10b981;" id="btc">--</span>
-        <span class="status" id="btc-stat" style="color: #10b981;">▲ YÜKSELİYOR</span>
-    </div>
-
-    <div class="service-grid">
-        <button class="service-btn" onclick="window.open('https://www.eczaneler.gen.tr/nobetci-' + document.getElementById('city-input').value.toLowerCase())">NÖBETÇİ ECZANELER</button>
-        <button class="service-btn" onclick="window.open('https://www.petrolofisi.com.tr/akaryakit-fiyatlari')">YAKIT FİYATLARI</button>
-    </div>
+    <div id="eco-section" class="eco-grid"></div>
 
     <button class="update-btn" onclick="verileriGetir()">SİSTEMİ GÜNCELLE</button>
 
@@ -102,24 +81,18 @@
 
     <div class="footer">
         <div class="signature">SEDAT ÇÖREKLİ</div>
-        <div style="font-size: 0.5rem; margin-top: 5px; color: #64748b;">© 2026 Developer Edition</div>
+        <div style="font-size: 0.5rem; margin-top: 10px; color: #64748b; opacity: 0.3;">v5.1 Final</div>
     </div>
 </div>
 
 <script>
     function temaDegistir() {
-        const body = document.body;
-        const btn = document.getElementById('theme-btn');
-        body.classList.toggle('light-mode');
-        btn.innerText = body.classList.contains('light-mode') ? "☀️" : "🌙";
+        document.body.classList.toggle('light-mode');
+        document.getElementById('theme-btn').innerText = document.body.classList.contains('light-mode') ? "☀️" : "🌙";
     }
 
     async function verileriGetir() {
         try {
-            const sehir = document.getElementById('city-input').value;
-            document.getElementById('city-name').innerText = sehir.toUpperCase();
-
-            // Ekonomi & Kripto
             const [ecoRes, crypRes] = await Promise.all([
                 fetch('https://api.exchangerate-api.com/v4/latest/USD'),
                 fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd')
@@ -131,55 +104,33 @@
 
             const items = [
                 { label: "USD/TRY", val: tryRate.toFixed(2), stat: "● STABİL", color: "#64748b" },
-                { label: "EUR/TRY", val: (tryRate / ecoData.rates.EUR).toFixed(2), stat: "▼ DÜŞÜŞTE", color: "#ef4444" },
-                { label: "GRAM ALTIN", val: gramVal.toFixed(2), stat: "▲ YÜKSELİYOR", color: "#10b981", gold: true },
-                { label: "ÇEYREK ALTIN", val: (gramVal * 1.63).toFixed(0), stat: "▲ HAREKETLİ", color: "#10b981", gold: true }
+                { label: "GRAM ALTIN", val: gramVal.toFixed(2), stat: "▲ YÜKSELİYOR", color: "#10b981" }
             ];
 
             let ecoHtml = "";
             items.forEach(i => {
-                ecoHtml += `<div class="eco-card" style="${i.gold ? 'border-color:var(--gold)' : ''}">
-                    <span class="label" style="${i.gold ? 'color:var(--gold)' : ''}">${i.label}</span>
+                ecoHtml += `<div class="eco-card">
+                    <span class="label">${i.label}</span>
                     <span class="value">${i.val} ₺</span>
                     <span class="status" style="color:${i.color}">${i.stat}</span>
                 </div>`;
             });
             document.getElementById('eco-section').innerHTML = ecoHtml;
-            document.getElementById('btc').innerText = "$" + crypData.bitcoin.usd.toLocaleString();
 
-            // Hava Durumu
-            const resW = await fetch(`https://api.wttr.in/${sehir}?format=j1`);
+            const resW = await fetch(`https://api.wttr.in/Burdur?format=j1`);
             const dataW = await resW.json();
             document.getElementById('temp').innerText = dataW.current_condition[0].temp_C + "°C";
             document.getElementById('weather-desc').innerText = dataW.current_condition[0].lang_tr[0].value;
 
-            // 20 Haber Motoru
-            const [resS, resH] = await Promise.allSettled([
-                fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika'),
-                fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml')
-            ]);
-            let tumHaberler = [];
-            if (resS.status === "fulfilled") {
-                const dS = await resS.value.json();
-                dS.items.forEach(i => tumHaberler.push({ k: "SÖZCÜ", t: i.title, l: i.link }));
-            }
-            if (resH.status === "fulfilled") {
-                const dH = await resH.value.json();
-                dH.items.forEach(i => tumHaberler.push({ k: "HABERTÜRK", t: i.title, l: i.link }));
-            }
-
+            const resN = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika');
+            const dataN = await resN.json();
             let html = "";
-            tumHaberler.slice(0, 20).forEach(h => {
-                html += `<a href="${h.l}" target="_blank" class="news-item">
-                    <span class="news-tag">${h.k}</span>
-                    <span style="display:inline-block; margin-top:5px;">${h.t}</span>
-                </a>`;
+            dataN.items.slice(0, 20).forEach(h => {
+                html += `<a href="${h.link}" target="_blank" class="news-item"><span class="news-tag">SON DAKİKA</span>${h.title}</a>`;
             });
-            document.getElementById('news-feed').innerHTML = html || "Haber yüklenemedi.";
+            document.getElementById('news-feed').innerHTML = html;
 
-        } catch (e) { 
-            document.getElementById('news-feed').innerHTML = "Bağlantı Hatası!"; 
-        }
+        } catch (e) { document.getElementById('news-feed').innerHTML = "Bağlantı hatası!"; }
     }
     window.onload = verileriGetir;
 </script>
