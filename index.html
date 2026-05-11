@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Insight | V3.1</title>
+    <title>Global Insight</title>
     <style>
         :root {
             --bg: #0a0e1a;
@@ -13,7 +13,6 @@
             --text: #f1f5f9;
             --border: #1e293b;
         }
-        /* Açık Tema Renkleri */
         .light-mode {
             --bg: #f8fafc;
             --card: #ffffff;
@@ -35,8 +34,7 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header h1 { font-size: 1.4rem; color: var(--accent); letter-spacing: 2px; margin: 0; }
         
-        /* Gece Modu Butonu Tamiri */
-        #theme-btn { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--text); }
+        #theme-btn { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--text); padding: 5px; }
 
         .search-container { display: flex; gap: 10px; margin-bottom: 20px; }
         .search-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); outline: none; }
@@ -58,8 +56,12 @@
 
         .update-btn { width: 100%; background: var(--accent); color: #0a0e1a; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; }
         
-        .news-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border-left: 4px solid var(--accent); font-size: 0.9rem; text-decoration: none; display: block; color: inherit; border: 1px solid var(--border); }
+        .news-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; text-decoration: none; display: block; color: inherit; }
         .news-tag { background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; margin-right: 8px; }
+
+        /* SEDAT ÇÖREKLİ İMZA STİLİ */
+        .footer { text-align: center; padding: 30px 0 10px 0; border-top: 1px solid var(--border); margin-top: 20px; }
+        .signature { font-size: 0.8rem; letter-spacing: 3px; font-weight: 900; color: var(--accent); text-transform: uppercase; opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -81,8 +83,7 @@
         <div style="font-weight: bold; letter-spacing: 1px;" id="city-name">BURDUR</div>
     </div>
 
-    <div class="eco-grid" id="eco-section">
-        </div>
+    <div class="eco-grid" id="eco-section"></div>
 
     <div class="btc-card">
         <span class="label">BITCOIN (BTC)</span>
@@ -98,6 +99,11 @@
     <button class="update-btn" onclick="verileriGetir()">SİSTEMİ GÜNCELLE</button>
 
     <div id="news-feed">Haberler hazırlanıyor...</div>
+
+    <div class="footer">
+        <div class="signature">SEDAT ÇÖREKLİ</div>
+        <div style="font-size: 0.5rem; margin-top: 5px; color: #64748b;">© 2026 Developer Edition</div>
+    </div>
 </div>
 
 <script>
@@ -113,19 +119,19 @@
             const sehir = document.getElementById('city-input').value;
             document.getElementById('city-name').innerText = sehir.toUpperCase();
 
-            // Ekonomi Analizi
-            const ecoRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+            // Ekonomi & Kripto
+            const [ecoRes, crypRes] = await Promise.all([
+                fetch('https://api.exchangerate-api.com/v4/latest/USD'),
+                fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd')
+            ]);
             const ecoData = await ecoRes.json();
-            const tryRate = ecoData.rates.TRY;
-            const eurRate = (tryRate / ecoData.rates.EUR);
-
-            const crypRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd');
             const crypData = await crypRes.json();
+            const tryRate = ecoData.rates.TRY;
             const gramVal = (crypData['pax-gold'].usd / 31.1035) * tryRate;
 
             const items = [
-                { label: "USD/TRY", val: tryRate.toFixed(2), stat: tryRate > 34 ? "▲ YÜKSELİYOR" : "● STABİL", color: tryRate > 34 ? "#ef4444" : "#64748b" },
-                { label: "EUR/TRY", val: eurRate.toFixed(2), stat: "▼ DÜŞÜŞTE", color: "#ef4444" },
+                { label: "USD/TRY", val: tryRate.toFixed(2), stat: "● STABİL", color: "#64748b" },
+                { label: "EUR/TRY", val: (tryRate / ecoData.rates.EUR).toFixed(2), stat: "▼ DÜŞÜŞTE", color: "#ef4444" },
                 { label: "GRAM ALTIN", val: gramVal.toFixed(2), stat: "▲ YÜKSELİYOR", color: "#10b981", gold: true },
                 { label: "ÇEYREK ALTIN", val: (gramVal * 1.63).toFixed(0), stat: "▲ HAREKETLİ", color: "#10b981", gold: true }
             ];
@@ -147,18 +153,34 @@
             document.getElementById('temp').innerText = dataW.current_condition[0].temp_C + "°C";
             document.getElementById('weather-desc').innerText = dataW.current_condition[0].lang_tr[0].value;
 
-            // 20 Haber Tamiri
-            const resS = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika');
-            const dS = await resS.json();
+            // 20 Haber Motoru
+            const [resS, resH] = await Promise.allSettled([
+                fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika'),
+                fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml')
+            ]);
+            let tumHaberler = [];
+            if (resS.status === "fulfilled") {
+                const dS = await resS.value.json();
+                dS.items.forEach(i => tumHaberler.push({ k: "SÖZCÜ", t: i.title, l: i.link }));
+            }
+            if (resH.status === "fulfilled") {
+                const dH = await resH.value.json();
+                dH.items.forEach(i => tumHaberler.push({ k: "HABERTÜRK", t: i.title, l: i.link }));
+            }
+
             let html = "";
-            dS.items.slice(0, 20).forEach(i => {
-                html += `<a href="${i.link}" target="_blank" class="news-item"><span class="news-tag">SON DAKİKA</span>${i.title}</a>`;
+            tumHaberler.slice(0, 20).forEach(h => {
+                html += `<a href="${h.l}" target="_blank" class="news-item">
+                    <span class="news-tag">${h.k}</span>
+                    <span style="display:inline-block; margin-top:5px;">${h.t}</span>
+                </a>`;
             });
-            document.getElementById('news-feed').innerHTML = html;
+            document.getElementById('news-feed').innerHTML = html || "Haber yüklenemedi.";
 
-        } catch (e) { document.getElementById('news-feed').innerText = "Bağlantı Hatası!"; }
+        } catch (e) { 
+            document.getElementById('news-feed').innerHTML = "Bağlantı Hatası!"; 
+        }
     }
-
     window.onload = verileriGetir;
 </script>
 </body>
