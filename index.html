@@ -6,33 +6,17 @@
     
     <title>Global Insight</title>
     <meta name="description" content="Sedat ÇÖREKLİ tarafından geliştirilen; anlık ekonomi, döviz ve son dakika haber paneli.">
-    <meta name="keywords" content="Sedat ÇÖREKLİ, haber paneli, ekonomi, Burdur hava durumu, dolar kuru">
     <meta name="author" content="Sedat ÇÖREKLİ">
-    <link rel="canonical" href="https://sedatcorekli01-ctrl.github.io/haber-paneli/">
+    <link rel="canonical" href="https://sedatcorekli01-ctrl.github.io/haber-panel/">
 
     <style>
         :root {
-            --bg: #0a0e1a;
-            --card: #151c2c;
-            --accent: #38bdf8;
-            --text: #f1f5f9;
-            --border: #1e293b;
+            --bg: #0a0e1a; --card: #151c2c; --accent: #38bdf8; --text: #f1f5f9; --border: #1e293b;
         }
         .light-mode {
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --accent: #0284c7;
-            --text: #0f172a;
-            --border: #e2e8f0;
+            --bg: #f8fafc; --card: #ffffff; --accent: #0284c7; --text: #0f172a; --border: #e2e8f0;
         }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 15px;
-            transition: 0.3s;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; transition: 0.3s; }
         .container { max-width: 500px; margin: 0 auto; }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -40,9 +24,9 @@
         
         #theme-btn { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--text); }
 
-        /* Şehir Arama Alanı */
+        /* ŞEHİR ARAMA BÖLÜMÜ */
         .search-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); outline: none; font-size: 0.9rem; }
+        .search-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); outline: none; }
         .search-btn { background: var(--accent); border: none; border-radius: 10px; padding: 0 20px; color: #0a0e1a; font-weight: bold; cursor: pointer; }
 
         .weather-card { background: var(--card); border: 1px solid var(--accent); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; }
@@ -57,9 +41,9 @@
 
         .btc-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
 
-        .update-btn { width: 100%; background: var(--accent); color: #0a0e1a; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; text-transform: uppercase; }
+        .update-btn { width: 100%; background: var(--accent); color: #0a0e1a; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; }
         
-        .news-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; text-decoration: none; display: block; color: inherit; line-height: 1.4; }
+        .news-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; text-decoration: none; display: block; color: inherit; }
         .news-tag { background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; margin-right: 8px; }
 
         .footer { text-align: center; padding: 40px 0 20px 0; border-top: 1px solid var(--border); margin-top: 20px; }
@@ -75,12 +59,12 @@
     </div>
 
     <div class="search-container">
-        <input type="text" id="city-input" class="search-input" placeholder="Şehir yaz..." value="BURDUR">
+        <input type="text" id="city-input" class="search-input" placeholder="Şehir..." value="BURDUR">
         <button class="search-btn" onclick="verileriGetir()">ARA</button>
     </div>
 
     <div class="weather-card">
-        <div id="weather-desc" style="color: #64748b;">Analiz ediliyor...</div>
+        <div id="weather-desc" style="color: #64748b;">Veriler alınıyor...</div>
         <div class="weather-temp" id="temp">--°C</div>
         <div style="font-weight: bold; letter-spacing: 2px;" id="city-name">BURDUR</div>
     </div>
@@ -90,7 +74,7 @@
     <div class="btc-card">
         <span class="label">BITCOIN (BTC)</span>
         <span class="value" style="color: #10b981;" id="btc">--</span>
-        <span class="status" style="color: #10b981;">▲ CANLI ANALİZ</span>
+        <span class="status" style="color: #10b981;">▲ CANLI VERİ</span>
     </div>
 
     <button class="update-btn" onclick="verileriGetir()">SİSTEMİ GÜNCELLE</button>
@@ -114,25 +98,21 @@
             const sehir = document.getElementById('city-input').value;
             document.getElementById('city-name').innerText = sehir.toUpperCase();
 
-            // Ekonomi Verileri
+            // Ekonomi ve Kripto Çekimi
             const [ecoRes, crypRes] = await Promise.all([
                 fetch('https://api.exchangerate-api.com/v4/latest/USD'),
                 fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd')
             ]);
-            
             const ecoData = await ecoRes.json();
             const crypData = await crypRes.json();
-            
             const tryRate = ecoData.rates.TRY;
-            const eurRate = (tryRate / ecoData.rates.EUR).toFixed(2);
             const gramVal = (crypData['pax-gold'].usd / 31.1035) * tryRate;
-            const ceyrekVal = (gramVal * 1.63).toFixed(0);
 
             const items = [
                 { label: "USD/TRY", val: tryRate.toFixed(2), stat: "● STABİL", color: "#64748b" },
-                { label: "EUR/TRY", val: eurRate, stat: "▼ DÜŞÜŞTE", color: "#ef4444" },
+                { label: "EUR/TRY", val: (tryRate / ecoData.rates.EUR).toFixed(2), stat: "▼ DÜŞÜŞTE", color: "#ef4444" },
                 { label: "GRAM ALTIN", val: gramVal.toFixed(2), stat: "▲ YÜKSELİYOR", color: "#10b981" },
-                { label: "ÇEYREK ALTIN", val: ceyrekVal, stat: "▲ HAREKETLİ", color: "#10b981" }
+                { label: "ÇEYREK ALTIN", val: (gramVal * 1.63).toFixed(0), stat: "▲ HAREKETLİ", color: "#10b981" }
             ];
 
             let ecoHtml = "";
@@ -142,26 +122,35 @@
             document.getElementById('eco-section').innerHTML = ecoHtml;
             document.getElementById('btc').innerText = "$" + crypData.bitcoin.usd.toLocaleString();
 
-            // Hava Durumu (Dinamik Şehir)
+            // Hava Durumu
             const resW = await fetch(`https://api.wttr.in/${sehir}?format=j1`);
             const dataW = await resW.json();
             document.getElementById('temp').innerText = dataW.current_condition[0].temp_C + "°C";
             document.getElementById('weather-desc').innerText = dataW.current_condition[0].lang_tr[0].value;
 
-            // 20 Haber
-            const resN = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika');
-            const dataN = await resN.json();
+            // 20 TANE HABER (Sözcü + Habertürk Birleşimi)
+            const [resS, resH] = await Promise.allSettled([
+                fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika'),
+                fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml')
+            ]);
+            let tumHaberler = [];
+            if (resS.status === "fulfilled") {
+                const dS = await resS.value.json();
+                dS.items.forEach(i => tumHaberler.push({ k: "SÖZCÜ", t: i.title, l: i.link }));
+            }
+            if (resH.status === "fulfilled") {
+                const dH = await resH.value.json();
+                dH.items.forEach(i => tumHaberler.push({ k: "HABERTÜRK", t: i.title, l: i.link }));
+            }
+            
             let html = "";
-            dataN.items.slice(0, 20).forEach(h => {
-                html += `<a href="${h.link}" target="_blank" class="news-item"><span class="news-tag">SON DAKİKA</span>${h.title}</a>`;
+            tumHaberler.slice(0, 20).forEach(h => {
+                html += `<a href="${h.l}" target="_blank" class="news-item"><span class="news-tag">${h.k} SON DAKİKA</span>${h.t}</a>`;
             });
-            document.getElementById('news-feed').innerHTML = html;
+            document.getElementById('news-feed').innerHTML = html || "Bağlantı hatası!";
 
-        } catch (e) { 
-            document.getElementById('news-feed').innerHTML = "Bağlantı hatası!"; 
-        }
+        } catch (e) { document.getElementById('news-feed').innerHTML = "Hata oluştu!"; }
     }
-
     window.onload = verileriGetir;
 </script>
 </body>
