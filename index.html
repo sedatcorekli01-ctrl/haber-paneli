@@ -17,7 +17,6 @@
             --accent: #38bdf8;
             --text: #f1f5f9;
             --border: #1e293b;
-            --gold: #fbbf24;
         }
         .light-mode {
             --bg: #f8fafc;
@@ -41,10 +40,14 @@
         
         #theme-btn { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--text); }
 
+        /* Şehir Arama Alanı */
+        .search-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); outline: none; font-size: 0.9rem; }
+        .search-btn { background: var(--accent); border: none; border-radius: 10px; padding: 0 20px; color: #0a0e1a; font-weight: bold; cursor: pointer; }
+
         .weather-card { background: var(--card); border: 1px solid var(--accent); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; }
         .weather-temp { font-size: 3.5rem; font-weight: bold; color: var(--accent); margin: 10px 0; }
         
-        /* 4'lü Kart Yapısı */
         .eco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
         .eco-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; }
         
@@ -52,7 +55,6 @@
         .value { font-size: 1.1rem; font-weight: bold; display: block; }
         .status { font-size: 0.6rem; font-weight: bold; margin-top: 8px; display: block; }
 
-        /* Bitcoin Kartı */
         .btc-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
 
         .update-btn { width: 100%; background: var(--accent); color: #0a0e1a; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; text-transform: uppercase; }
@@ -72,8 +74,13 @@
         <button id="theme-btn" onclick="temaDegistir()">🌙</button>
     </div>
 
+    <div class="search-container">
+        <input type="text" id="city-input" class="search-input" placeholder="Şehir yaz..." value="BURDUR">
+        <button class="search-btn" onclick="verileriGetir()">ARA</button>
+    </div>
+
     <div class="weather-card">
-        <div id="weather-desc" style="color: #64748b;">Veriler alınıyor...</div>
+        <div id="weather-desc" style="color: #64748b;">Analiz ediliyor...</div>
         <div class="weather-temp" id="temp">--°C</div>
         <div style="font-weight: bold; letter-spacing: 2px;" id="city-name">BURDUR</div>
     </div>
@@ -104,7 +111,10 @@
 
     async function verileriGetir() {
         try {
-            // 1. Ekonomi Verilerini Çek (Döviz + Altın)
+            const sehir = document.getElementById('city-input').value;
+            document.getElementById('city-name').innerText = sehir.toUpperCase();
+
+            // Ekonomi Verileri
             const [ecoRes, crypRes] = await Promise.all([
                 fetch('https://api.exchangerate-api.com/v4/latest/USD'),
                 fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd')
@@ -127,22 +137,18 @@
 
             let ecoHtml = "";
             items.forEach(i => {
-                ecoHtml += `<div class="eco-card">
-                    <span class="label">${i.label}</span>
-                    <span class="value">${i.val} ₺</span>
-                    <span class="status" style="color:${i.color}">${i.stat}</span>
-                </div>`;
+                ecoHtml += `<div class="eco-card"><span class="label">${i.label}</span><span class="value">${i.val} ₺</span><span class="status" style="color:${i.color}">${i.stat}</span></div>`;
             });
             document.getElementById('eco-section').innerHTML = ecoHtml;
             document.getElementById('btc').innerText = "$" + crypData.bitcoin.usd.toLocaleString();
 
-            // 2. Burdur Hava Durumu
-            const resW = await fetch(`https://api.wttr.in/Burdur?format=j1`);
+            // Hava Durumu (Dinamik Şehir)
+            const resW = await fetch(`https://api.wttr.in/${sehir}?format=j1`);
             const dataW = await resW.json();
             document.getElementById('temp').innerText = dataW.current_condition[0].temp_C + "°C";
             document.getElementById('weather-desc').innerText = dataW.current_condition[0].lang_tr[0].value;
 
-            // 3. 20 Haber Akışı
+            // 20 Haber
             const resN = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika');
             const dataN = await resN.json();
             let html = "";
@@ -152,7 +158,7 @@
             document.getElementById('news-feed').innerHTML = html;
 
         } catch (e) { 
-            document.getElementById('news-feed').innerHTML = "Veriler güncellenirken bir hata oluştu."; 
+            document.getElementById('news-feed').innerHTML = "Bağlantı hatası!"; 
         }
     }
 
