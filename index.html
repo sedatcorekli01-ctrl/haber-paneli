@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Global Insight | Sedat ÇÖREKLİ</title>
+    <title>Global Insight</title>
     <meta name="description" content="Sedat ÇÖREKLİ tarafından geliştirilen; anlık ekonomi, döviz ve son dakika haber paneli.">
     <meta name="keywords" content="Sedat ÇÖREKLİ, haber paneli, ekonomi, Burdur hava durumu, dolar kuru">
     <meta name="author" content="Sedat ÇÖREKLİ">
@@ -17,6 +17,7 @@
             --accent: #38bdf8;
             --text: #f1f5f9;
             --border: #1e293b;
+            --gold: #fbbf24;
         }
         .light-mode {
             --bg: #f8fafc;
@@ -43,16 +44,20 @@
         .weather-card { background: var(--card); border: 1px solid var(--accent); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; }
         .weather-temp { font-size: 3.5rem; font-weight: bold; color: var(--accent); margin: 10px 0; }
         
-        .eco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        /* 4'lü Kart Yapısı */
+        .eco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
         .eco-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; }
         
         .label { font-size: 0.65rem; color: #64748b; font-weight: bold; display: block; margin-bottom: 5px; text-transform: uppercase; }
-        .value { font-size: 1.2rem; font-weight: bold; display: block; }
-        .status { font-size: 0.65rem; font-weight: bold; margin-top: 8px; display: block; }
+        .value { font-size: 1.1rem; font-weight: bold; display: block; }
+        .status { font-size: 0.6rem; font-weight: bold; margin-top: 8px; display: block; }
 
-        .update-btn { width: 100%; background: var(--accent); color: #0a0e1a; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; }
+        /* Bitcoin Kartı */
+        .btc-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
+
+        .update-btn { width: 100%; background: var(--accent); color: #0a0e1a; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; text-transform: uppercase; }
         
-        .news-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; text-decoration: none; display: block; color: inherit; }
+        .news-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; text-decoration: none; display: block; color: inherit; line-height: 1.4; }
         .news-tag { background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; margin-right: 8px; }
 
         .footer { text-align: center; padding: 40px 0 20px 0; border-top: 1px solid var(--border); margin-top: 20px; }
@@ -75,13 +80,19 @@
 
     <div id="eco-section" class="eco-grid"></div>
 
+    <div class="btc-card">
+        <span class="label">BITCOIN (BTC)</span>
+        <span class="value" style="color: #10b981;" id="btc">--</span>
+        <span class="status" style="color: #10b981;">▲ CANLI ANALİZ</span>
+    </div>
+
     <button class="update-btn" onclick="verileriGetir()">SİSTEMİ GÜNCELLE</button>
 
     <div id="news-feed">Haberler hazırlanıyor...</div>
 
     <div class="footer">
         <div class="signature">SEDAT ÇÖREKLİ</div>
-        <div style="font-size: 0.5rem; margin-top: 10px; color: #64748b; opacity: 0.3;">v5.1 Final</div>
+        <div style="font-size: 0.5rem; margin-top: 10px; color: #64748b; opacity: 0.3;">© 2026 Developer Edition</div>
     </div>
 </div>
 
@@ -93,18 +104,25 @@
 
     async function verileriGetir() {
         try {
+            // 1. Ekonomi Verilerini Çek (Döviz + Altın)
             const [ecoRes, crypRes] = await Promise.all([
                 fetch('https://api.exchangerate-api.com/v4/latest/USD'),
                 fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd')
             ]);
+            
             const ecoData = await ecoRes.json();
             const crypData = await crypRes.json();
+            
             const tryRate = ecoData.rates.TRY;
+            const eurRate = (tryRate / ecoData.rates.EUR).toFixed(2);
             const gramVal = (crypData['pax-gold'].usd / 31.1035) * tryRate;
+            const ceyrekVal = (gramVal * 1.63).toFixed(0);
 
             const items = [
                 { label: "USD/TRY", val: tryRate.toFixed(2), stat: "● STABİL", color: "#64748b" },
-                { label: "GRAM ALTIN", val: gramVal.toFixed(2), stat: "▲ YÜKSELİYOR", color: "#10b981" }
+                { label: "EUR/TRY", val: eurRate, stat: "▼ DÜŞÜŞTE", color: "#ef4444" },
+                { label: "GRAM ALTIN", val: gramVal.toFixed(2), stat: "▲ YÜKSELİYOR", color: "#10b981" },
+                { label: "ÇEYREK ALTIN", val: ceyrekVal, stat: "▲ HAREKETLİ", color: "#10b981" }
             ];
 
             let ecoHtml = "";
@@ -116,12 +134,15 @@
                 </div>`;
             });
             document.getElementById('eco-section').innerHTML = ecoHtml;
+            document.getElementById('btc').innerText = "$" + crypData.bitcoin.usd.toLocaleString();
 
+            // 2. Burdur Hava Durumu
             const resW = await fetch(`https://api.wttr.in/Burdur?format=j1`);
             const dataW = await resW.json();
             document.getElementById('temp').innerText = dataW.current_condition[0].temp_C + "°C";
             document.getElementById('weather-desc').innerText = dataW.current_condition[0].lang_tr[0].value;
 
+            // 3. 20 Haber Akışı
             const resN = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika');
             const dataN = await resN.json();
             let html = "";
@@ -130,8 +151,11 @@
             });
             document.getElementById('news-feed').innerHTML = html;
 
-        } catch (e) { document.getElementById('news-feed').innerHTML = "Bağlantı hatası!"; }
+        } catch (e) { 
+            document.getElementById('news-feed').innerHTML = "Veriler güncellenirken bir hata oluştu."; 
+        }
     }
+
     window.onload = verileriGetir;
 </script>
 </body>
