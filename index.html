@@ -6,17 +6,17 @@
     
     <meta name="google-site-verification" content="Vpu76lYmPfgmLw7mKOJahAlh3751LZKWtWeIQQ47bRU" />
 
-    <title>InsightTurk</title>
-    <meta name="description" content="Sedat ÇÖREKLİ tarafından geliştirilen; InsightTurk anlık ekonomi, döviz ve son dakika haber paneli.">
+    <title>Insighturk</title>
+    <meta name="description" content="Sedat ÇÖREKLİ tarafından geliştirilen; Insighturk anlık ekonomi, döviz ve son dakika haber paneli.">
     <meta name="author" content="Sedat ÇÖREKLİ">
     <link rel="canonical" href="https://sedatcorekli01-ctrl.github.io/haber-panel/">
 
     <style>
         :root {
-            --bg: #0a0e1a; --card: #151c2c; --accent: #38bdf8; --text: #f1f5f9; --border: #1e293b; --error: #ef4444;
+            --bg: #0a0e1a; --card: #151c2c; --accent: #38bdf8; --text: #f1f5f9; --border: #1e293b; --error: #ef4444; --subtext: #94a3b8;
         }
         .light-mode {
-            --bg: #f8fafc; --card: #ffffff; --accent: #0284c7; --text: #0f172a; --border: #e2e8f0; --error: #dc2626;
+            --bg: #f8fafc; --card: #ffffff; --accent: #0284c7; --text: #0f172a; --border: #e2e8f0; --error: #dc2626; --subtext: #475569;
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; transition: 0.3s; }
         .container { max-width: 500px; margin: 0 auto; }
@@ -24,37 +24,39 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header h1 { font-size: 1.4rem; color: var(--accent); letter-spacing: 2px; margin: 0; font-weight: 800; }
         
-        #theme-btn { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--text); }
+        #theme-btn { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--text); min-width: 48px; min-height: 48px; display: flex; align-items: center; justify-content: center; }
 
         /* ŞEHİR ARAMA BÖLÜMÜ */
         .search-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); outline: none; }
-        .search-btn { background: var(--accent); border: none; border-radius: 10px; padding: 0 20px; color: #0a0e1a; font-weight: bold; cursor: pointer; }
+        .search-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); outline: none; font-size: 1rem; }
+        .search-btn { background: var(--accent); border: none; border-radius: 10px; padding: 0 24px; color: #0a0e1a; font-weight: bold; cursor: pointer; min-height: 48px; font-size: 1rem; }
 
         .weather-card { background: var(--card); border: 1px solid var(--accent); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; }
+        .weather-desc { color: var(--subtext); font-weight: 500; font-size: 0.95rem; }
         .weather-temp { font-size: 3.5rem; font-weight: bold; color: var(--accent); margin: 10px 0; }
         
         .eco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
         .eco-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; }
         
-        .label { font-size: 0.65rem; color: #64748b; font-weight: bold; display: block; margin-bottom: 5px; text-transform: uppercase; }
-        .value { font-size: 1.1rem; font-weight: bold; display: block; }
-        .status { font-size: 0.6rem; font-weight: bold; margin-top: 8px; display: block; }
+        .label { font-size: 0.75rem; color: var(--subtext); font-weight: bold; display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .value { font-size: 1.2rem; font-weight: bold; display: block; }
+        .status { font-size: 0.7rem; font-weight: bold; margin-top: 8px; display: block; }
 
         .btc-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
 
-        .update-btn { width: 100%; background: var(--accent); color: #0a0e1a; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; }
+        .update-btn { width: 100%; background: var(--accent); color: #0a0e1a; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; min-height: 48px; font-size: 1rem; }
         
-        .news-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; text-decoration: none; display: block; color: inherit; }
-        .news-tag { background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; margin-right: 8px; }
+        .news-item { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); font-size: 0.95rem; text-decoration: none; display: block; color: inherit; line-height: 1.4; }
+        .news-tag { background: #ef4444; color: white; padding: 3px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-right: 8px; display: inline-block; vertical-align: middle; }
 
         /* HATA BİLDİRİM KUTUSU (TOAST) */
         .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; max-width: 300px; }
-        .toast { background: var(--card); border-left: 4px solid var(--error); color: var(--text); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 0.8rem; font-weight: bold; animation: slideIn 0.3s ease; }
+        .toast { background: var(--card); border-left: 4px solid var(--error); color: var(--text); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 0.85rem; font-weight: bold; animation: slideIn 0.3s ease; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         .footer { text-align: center; padding: 40px 0 20px 0; border-top: 1px solid var(--border); margin-top: 20px; }
-        .signature { font-size: 1rem; letter-spacing: 3px; font-weight: 900; color: var(--accent); text-transform: uppercase; }
+        .signature { font-size: 1.1rem; letter-spacing: 3px; font-weight: 900; color: var(--accent); text-transform: uppercase; }
+        .footer-credit { font-size: 0.65rem; margin-top: 10px; color: var(--subtext); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -64,18 +66,18 @@
 <div class="container">
     <div class="header">
         <h1>INSIGHTURK</h1>
-        <button id="theme-btn" onclick="temaDegistir()">🌙</button>
+        <button id="theme-btn" onclick="temaDegistir()" aria-label="Tema Değiştir">🌙</button>
     </div>
 
     <div class="search-container">
-        <input type="text" id="city-input" class="search-input" placeholder="Şehir..." value="BURDUR">
+        <input type="text" id="city-input" class="search-input" placeholder="Şehir giriniz..." value="BURDUR" aria-label="Şehir Ara">
         <button class="search-btn" onclick="verileriGetir()">ARA</button>
     </div>
 
     <div class="weather-card">
-        <div id="weather-desc" style="color: #64748b;">Veriler alınıyor...</div>
+        <div id="weather-desc" class="weather-desc">Veriler alınıyor...</div>
         <div class="weather-temp" id="temp">--°C</div>
-        <div style="font-weight: bold; letter-spacing: 2px;" id="city-name">BURDUR</div>
+        <div style="font-weight: bold; letter-spacing: 2px; font-size: 1.1rem;" id="city-name">BURDUR</div>
     </div>
 
     <div id="eco-section" class="eco-grid">
@@ -97,7 +99,7 @@
 
     <div class="footer">
         <div class="signature">SEDAT ÇÖREKLİ</div>
-        <div style="font-size: 0.5rem; margin-top: 10px; color: #64748b; opacity: 0.3;">© 2026 Developer Edition</div>
+        <div class="footer-credit">© 2026 Developer Edition</div>
     </div>
 </div>
 
@@ -135,7 +137,7 @@
             const gramVal = (crypData['pax-gold'].usd / 31.1035) * tryRate;
 
             const items = [
-                { label: "USD/TRY", val: tryRate.toFixed(2), stat: "● STABİL", color: "#64748b" },
+                { label: "USD/TRY", val: tryRate.toFixed(2), stat: "● STABİL", color: varSeçer("#64748b", "#475569") },
                 { label: "EUR/TRY", val: (tryRate / ecoData.rates.EUR).toFixed(2), stat: "▼ DÜŞÜŞTE", color: "#ef4444" },
                 { label: "GRAM ALTIN", val: gramVal.toFixed(2), stat: "▲ YÜKSELİYOR", color: "#10b981" },
                 { label: "ÇEYREK ALTIN", val: (gramVal * 1.63).toFixed(0), stat: "▲ HAREKETLİ", color: "#10b981" }
@@ -200,6 +202,10 @@
             hataBildirimiGoster("Haber beslemesi yüklenemedi.");
             document.getElementById('news-feed').innerHTML = "<div class='news-item' style='text-align:center; color:var(--error);'>Haber sunucusuna bağlanılamıyor.</div>";
         }
+    }
+    
+    function varSeçer(koyu, acik) {
+        return document.body.classList.contains('light-mode') ? acik : koyu;
     }
     window.onload = verileriGetir;
 </script>
