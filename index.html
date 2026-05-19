@@ -13,10 +13,10 @@
 
     <style>
         :root {
-            --bg: #0a0e1a; --card: #151c2c; --accent: #38bdf8; --text: #f1f5f9; --border: #1e293b;
+            --bg: #0a0e1a; --card: #151c2c; --accent: #38bdf8; --text: #f1f5f9; --border: #1e293b; --error: #ef4444;
         }
         .light-mode {
-            --bg: #f8fafc; --card: #ffffff; --accent: #0284c7; --text: #0f172a; --border: #e2e8f0;
+            --bg: #f8fafc; --card: #ffffff; --accent: #0284c7; --text: #0f172a; --border: #e2e8f0; --error: #dc2626;
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; transition: 0.3s; }
         .container { max-width: 500px; margin: 0 auto; }
@@ -48,11 +48,18 @@
         .news-item { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; text-decoration: none; display: block; color: inherit; }
         .news-tag { background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; margin-right: 8px; }
 
+        /* HATA BİLDİRİM KUTUSU (TOAST) */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; max-width: 300px; }
+        .toast { background: var(--card); border-left: 4px solid var(--error); color: var(--text); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 0.8rem; font-weight: bold; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
         .footer { text-align: center; padding: 40px 0 20px 0; border-top: 1px solid var(--border); margin-top: 20px; }
         .signature { font-size: 1rem; letter-spacing: 3px; font-weight: 900; color: var(--accent); text-transform: uppercase; }
     </style>
 </head>
 <body>
+
+<div class="toast-container" id="toast-box"></div>
 
 <div class="container">
     <div class="header">
@@ -71,12 +78,17 @@
         <div style="font-weight: bold; letter-spacing: 2px;" id="city-name">BURDUR</div>
     </div>
 
-    <div id="eco-section" class="eco-grid"></div>
+    <div id="eco-section" class="eco-grid">
+        <div class="eco-card"><span class="label">USD/TRY</span><span class="value">-- ₺</span><span class="status">YÜKLENİYOR...</span></div>
+        <div class="eco-card"><span class="label">EUR/TRY</span><span class="value">-- ₺</span><span class="status">YÜKLENİYOR...</span></div>
+        <div class="eco-card"><span class="label">GRAM ALTIN</span><span class="value">-- ₺</span><span class="status">YÜKLENİYOR...</span></div>
+        <div class="eco-card"><span class="label">ÇEYREK ALTIN</span><span class="value">-- ₺</span><span class="status">YÜKLENİYOR...</span></div>
+    </div>
 
     <div class="btc-card">
         <span class="label">BITCOIN (BTC)</span>
         <span class="value" style="color: #10b981;" id="btc">--</span>
-        <span class="status" style="color: #10b981;">▲ CANLI VERİ</span>
+        <span class="status" id="btc-status" style="color: #10b981;">▲ CANLI VERİ</span>
     </div>
 
     <button class="update-btn" onclick="verileriGetir()">SİSTEMİ GÜNCELLE</button>
@@ -95,16 +107,28 @@
         document.getElementById('theme-btn').innerText = document.body.classList.contains('light-mode') ? "☀️" : "🌙";
     }
 
-    async function verileriGetir() {
-        try {
-            const sehir = document.getElementById('city-input').value;
-            document.getElementById('city-name').innerText = sehir.toUpperCase();
+    function hataBildirimiGoster(mesaj) {
+        const toastBox = document.getElementById('toast-box');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerText = mesaj;
+        toastBox.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 4000);
+    }
 
-            // Ekonomi ve Kripto Çekimi
+    async function verileriGetir() {
+        const sehir = document.getElementById('city-input').value;
+        document.getElementById('city-name').innerText = sehir.toUpperCase();
+
+        // 1. MODÜL: EKONOMİ VE KRİPTO VERİLERİ
+        try {
             const [ecoRes, crypRes] = await Promise.all([
                 fetch('https://api.exchangerate-api.com/v4/latest/USD'),
                 fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd')
             ]);
+            
+            if (!ecoRes.ok || !crypRes.ok) throw new Error("Finans sunucusu yanıt vermedi.");
+
             const ecoData = await ecoRes.json();
             const crypData = await crypRes.json();
             const tryRate = ecoData.rates.TRY;
@@ -123,24 +147,41 @@
             });
             document.getElementById('eco-section').innerHTML = ecoHtml;
             document.getElementById('btc').innerText = "$" + crypData.bitcoin.usd.toLocaleString();
+            document.getElementById('btc-status').innerText = "▲ CANLI VERİ";
+            document.getElementById('btc-status').style.color = "#10b981";
 
-            // Hava Durumu
+        } catch (error) {
+            hataBildirimiGoster("Finansal veriler güncellenemedi.");
+            document.getElementById('btc-status').innerText = "❌ VERİ ALINAMADI";
+            document.getElementById('btc-status').style.color = "var(--error)";
+        }
+
+        // 2. MODÜL: HAVA DURUMU
+        try {
             const resW = await fetch(`https://api.wttr.in/${sehir}?format=j1`);
+            if (!resW.ok) throw new Error("Hava durumu sunucusu hatası.");
             const dataW = await resW.json();
             document.getElementById('temp').innerText = dataW.current_condition[0].temp_C + "°C";
             document.getElementById('weather-desc').innerText = dataW.current_condition[0].lang_tr[0].value;
+        } catch (error) {
+            hataBildirimiGoster("Hava durumu verisi alınamadı.");
+            document.getElementById('temp').innerText = "--°C";
+            document.getElementById('weather-desc').innerText = "Bağlantı Hatası";
+        }
 
-            // 20 TANE HABER (Sözcü + Habertürk Birleşimi)
+        // 3. MODÜL: SON DAKİKA HABERLERİ
+        try {
             const [resS, resH] = await Promise.allSettled([
                 fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika'),
                 fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.haberturk.com%2Frss%2Fmanset.xml')
             ]);
+            
             let tumHaberler = [];
-            if (resS.status === "fulfilled") {
+            if (resS.status === "fulfilled" && resS.value.ok) {
                 const dS = await resS.value.json();
                 dS.items.forEach(i => tumHaberler.push({ k: "SÖZCÜ", t: i.title, l: i.link }));
             }
-            if (resH.status === "fulfilled") {
+            if (resH.status === "fulfilled" && resH.value.ok) {
                 const dH = await resH.value.json();
                 dH.items.forEach(i => tumHaberler.push({ k: "HABERTÜRK", t: i.title, l: i.link }));
             }
@@ -149,9 +190,16 @@
             tumHaberler.slice(0, 20).forEach(h => {
                 html += `<a href="${h.l}" target="_blank" class="news-item"><span class="news-tag">${h.k} SON DAKİKA</span>${h.t}</a>`;
             });
-            document.getElementById('news-feed').innerHTML = html || "Bağlantı hatası!";
+            
+            if(tumHaberler.length === 0) {
+                throw new Error("Haber akışı sağlanamadı.");
+            }
+            document.getElementById('news-feed').innerHTML = html;
 
-        } catch (e) { document.getElementById('news-feed').innerHTML = "Hata oluştu!"; }
+        } catch (error) {
+            hataBildirimiGoster("Haber beslemesi yüklenemedi.");
+            document.getElementById('news-feed').innerHTML = "<div class='news-item' style='text-align:center; color:var(--error);'>Haber sunucusuna bağlanılamıyor.</div>";
+        }
     }
     window.onload = verileriGetir;
 </script>
