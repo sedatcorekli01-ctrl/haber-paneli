@@ -32,7 +32,7 @@
         .search-btn { background: var(--accent); border: none; border-radius: 10px; padding: 0 24px; color: #0a0e1a; font-weight: bold; cursor: pointer; min-height: 48px; font-size: 1rem; }
 
         .weather-card { background: var(--card); border: 1px solid var(--accent); border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 20px; }
-        .weather-desc { color: var(--subtext); font-weight: 500; font-size: 0.95rem; }
+        .weather-desc { color: var(--subtext); font-weight: 500; font-size: 0.95rem; text-transform: capitalize; }
         .weather-temp { font-size: 3.5rem; font-weight: bold; color: var(--accent); margin: 10px 0; }
         
         .eco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
@@ -43,6 +43,11 @@
         .status { font-size: 0.7rem; font-weight: bold; margin-top: 8px; display: block; }
 
         .btc-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
+
+        /* SİTE UYUMLU PAYLAŞIM ALANI */
+        .share-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
+        .whatsapp-btn { width: 100%; background: transparent; color: var(--text); border: 1px solid var(--border); padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; min-height: 48px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .whatsapp-btn:hover { background: var(--border); border-color: var(--accent); color: var(--accent); }
 
         .update-btn { width: 100%; background: var(--accent); color: #0a0e1a; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-bottom: 20px; min-height: 48px; font-size: 1rem; }
         
@@ -93,6 +98,13 @@
         <span class="status" id="btc-status" style="color: #10b981;">▲ CANLI VERİ</span>
     </div>
 
+    <div class="share-card">
+        <span class="label" style="margin-bottom: 10px;">HIZLI PAYLAŞIM</span>
+        <button class="whatsapp-btn" onclick="whatsappPaylas()">
+            <span>Piyasayı WhatsApp'ta Paylaş</span>
+        </button>
+    </div>
+
     <button class="update-btn" onclick="verileriGetir()">SİSTEMİ GÜNCELLE</button>
 
     <div id="news-feed">Haberler hazırlanıyor...</div>
@@ -104,6 +116,8 @@
 </div>
 
 <script>
+    let sonRaporMetni = "";
+
     function temaDegistir() {
         document.body.classList.toggle('light-mode');
         document.getElementById('theme-btn').innerText = document.body.classList.contains('light-mode') ? "☀️" : "🌙";
@@ -113,16 +127,48 @@
         const toastBox = document.getElementById('toast-box');
         const toast = document.createElement('div');
         toast.className = 'toast';
-        toast.innerText = mesaj;
+        toast.innerText = railsSafeHTML(mesaj);
         toastBox.appendChild(toast);
         setTimeout(() => { toast.remove(); }, 4000);
+    }
+
+    function railsSafeHTML(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // WTTR API'SİNİN BAZEN PARALELDE BOZUK DÖNDÜRDÜĞÜ İNGİLİZCE TERİMLERİ TÜRKÇEYE ÇEVİREN SÖZLÜK FONKSİYONU
+    function havaDurumuCevir(ingilizceMetin) {
+        if (!ingilizceMetin) return "Bilinmiyor";
+        const terim = ingilizceMetin.toLowerCase().trim();
+        
+        const sozluk = {
+            "sunny": "Güneşli",
+            "clear": "Açık",
+            "cloudy": "Bulutlu",
+            "overcast": "Kapalı",
+            "partly cloudy": "Parçalı Bulutlu",
+            "mist": "Puslu",
+            "fog": "Sisli",
+            "patchy rain nearby": "Bölgesel Yağmurlu",
+            "patchy rain possible": "Yer Yer Yağış İhtimali",
+            "light rain": "Hafif Yağmurlu",
+            "moderate rain": "Orta Şiddetli Yağmurlu",
+            "heavy rain": "Şiddetli Yağmurlu",
+            "thundery outbreaks possible": "Gökgürültülü Fırtına İhtimali",
+            "patchy snow nearby": "Bölgesel Karlı",
+            "light snow": "Hafif Karlı",
+            "heavy snow": "Yoğun Karlı"
+        };
+
+        return sozluk[terim] || ingilizceMetin;
     }
 
     async function verileriGetir() {
         const sehir = document.getElementById('city-input').value;
         document.getElementById('city-name').innerText = sehir.toUpperCase();
 
-        // 1. MODÜL: EKONOMİ VE KRİPTO VERİLERİ
+        let usdFiyat = "--", eurFiyat = "--", gramFiyat = "--", ceyrekFiyat = "--", btcFiyat = "--";
+
         try {
             const [ecoRes, crypRes] = await Promise.all([
                 fetch('https://api.exchangerate-api.com/v4/latest/USD'),
@@ -136,11 +182,17 @@
             const tryRate = ecoData.rates.TRY;
             const gramVal = (crypData['pax-gold'].usd / 31.1035) * tryRate;
 
+            usdFiyat = tryRate.toFixed(2);
+            eurFiyat = (tryRate / ecoData.rates.EUR).toFixed(2);
+            gramFiyat = gramVal.toFixed(2);
+            ceyrekFiyat = (gramVal * 1.63).toFixed(0);
+            btcFiyat = "$" + crypData.bitcoin.usd.toLocaleString();
+
             const items = [
-                { label: "USD/TRY", val: tryRate.toFixed(2), stat: "● STABİL", color: varSeçer("#64748b", "#475569") },
-                { label: "EUR/TRY", val: (tryRate / ecoData.rates.EUR).toFixed(2), stat: "▼ DÜŞÜŞTE", color: "#ef4444" },
-                { label: "GRAM ALTIN", val: gramVal.toFixed(2), stat: "▲ YÜKSELİYOR", color: "#10b981" },
-                { label: "ÇEYREK ALTIN", val: (gramVal * 1.63).toFixed(0), stat: "▲ HAREKETLİ", color: "#10b981" }
+                { label: "USD/TRY", val: usdFiyat, stat: "● STABİL", color: varSeçer("#64748b", "#475569") },
+                { label: "EUR/TRY", val: eurFiyat, stat: "▼ DÜŞÜŞTE", color: "#ef4444" },
+                { label: "GRAM ALTIN", val: gramFiyat, stat: "▲ YÜKSELİYOR", color: "#10b981" },
+                { label: "ÇEYREK ALTIN", val: ceyrekFiyat, stat: "▲ HAREKETLİ", color: "#10b981" }
             ];
 
             let ecoHtml = "";
@@ -148,9 +200,16 @@
                 ecoHtml += `<div class="eco-card"><span class="label">${i.label}</span><span class="value">${i.val} ₺</span><span class="status" style="color:${i.color}">${i.stat}</span></div>`;
             });
             document.getElementById('eco-section').innerHTML = ecoHtml;
-            document.getElementById('btc').innerText = "$" + crypData.bitcoin.usd.toLocaleString();
+            document.getElementById('btc').innerText = btcFiyat;
             document.getElementById('btc-status').innerText = "▲ CANLI VERİ";
             document.getElementById('btc-status').style.color = "#10b981";
+
+            sonRaporMetni = `📱 *Insighturk Anlık Piyasa Raporu* \\n\\n` +
+                            `💵 *USD:* ${usdFiyat} ₺ (Stabil) \\n` +
+                            `💶 *EUR:* ${eurFiyat} ₺ (Düşüşte) \\n` +
+                            `🟡 *Gram Altın:* ${gramFiyat} ₺ (Yükseliyor) \\n` +
+                            `🪙 *Bitcoin:* ${btcFiyat} \\n\\n` +
+                            `👉 *Canlı Takip Et:* https://sedatcorekli01-ctrl.github.io/haber-panel/`;
 
         } catch (error) {
             hataBildirimiGoster("Finansal veriler güncellenemedi.");
@@ -158,20 +217,28 @@
             document.getElementById('btc-status').style.color = "var(--error)";
         }
 
-        // 2. MODÜL: HAVA DURUMU
         try {
-            const resW = await fetch(`https://api.wttr.in/${sehir}?format=j1`);
+            const resW = await fetch(`https://api.wttr.in/${sehir}?format=j1&lang=tr`);
             if (!resW.ok) throw new Error("Hava durumu sunucusu hatası.");
             const dataW = await resW.json();
+            
             document.getElementById('temp').innerText = dataW.current_condition[0].temp_C + "°C";
-            document.getElementById('weather-desc').innerText = dataW.current_condition[0].lang_tr[0].value;
+            
+            let durumMetni = "";
+            if (dataW.current_condition[0].lang_tr && dataW.current_condition[0].lang_tr[0]) {
+                durumMetni = dataW.current_condition[0].lang_tr[0].value;
+            } else {
+                durumMetni = dataW.current_condition[0].weatherDesc[0].value;
+            }
+            
+            document.getElementById('weather-desc').innerText = havaDurumuCevir(durumMetni);
+            
         } catch (error) {
             hataBildirimiGoster("Hava durumu verisi alınamadı.");
             document.getElementById('temp').innerText = "--°C";
             document.getElementById('weather-desc').innerText = "Bağlantı Hatası";
         }
 
-        // 3. MODÜL: SON DAKİKA HABERLERİ
         try {
             const [resS, resH] = await Promise.allSettled([
                 fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.sozcu.com.tr%2Ffeeds-son-dakika'),
@@ -194,7 +261,7 @@
             });
             
             if(tumHaberler.length === 0) {
-                throw new Error("Haber akışı sağlanamadı.");
+                throw new Error("Haber akışı sağlamadı.");
             }
             document.getElementById('news-feed').innerHTML = html;
 
@@ -204,9 +271,19 @@
         }
     }
     
+    function whatsappPaylas() {
+        if(!sonRaporMetni) {
+            hataBildirimiGoster("Önce verilerin yüklenmesini bekleyin.");
+            return;
+        }
+        const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(sonRaporMetni);
+        window.open(url, '_blank');
+    }
+
     function varSeçer(koyu, acik) {
         return document.body.classList.contains('light-mode') ? acik : koyu;
     }
+
     window.onload = verileriGetir;
 </script>
 </body>
