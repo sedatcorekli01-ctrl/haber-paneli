@@ -136,7 +136,6 @@
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // WTTR API'SİNİN BAZEN PARALELDE BOZUK DÖNDÜRDÜĞÜ İNGİLİZCE TERİMLERİ TÜRKÇEYE ÇEVİREN SÖZLÜK FONKSİYONU
     function havaDurumuCevir(ingilizceMetin) {
         if (!ingilizceMetin) return "Bilinmiyor";
         const terim = ingilizceMetin.toLowerCase().trim();
@@ -261,7 +260,7 @@
             });
             
             if(tumHaberler.length === 0) {
-                throw new Error("Haber akışı sağlamadı.");
+                throw new Error("Haber akışı sağlanamadı.");
             }
             document.getElementById('news-feed').innerHTML = html;
 
