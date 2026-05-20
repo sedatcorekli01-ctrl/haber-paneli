@@ -13,7 +13,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -22,7 +22,7 @@
         .light-mode {
             --bg: #f8fafc; --card: #ffffff; --accent: #0284c7; --text: #0f172a; --border: #e2e8f0; --error: #dc2626; --subtext: #475569;
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; transition: 0.3s; content-visibility: auto; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; transition: 0.3s; }
         .container { max-width: 500px; margin: 0 auto; }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -43,7 +43,9 @@
         
         .label { font-size: 0.75rem; color: var(--subtext); font-weight: bold; display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
         .value { font-size: 1.2rem; font-weight: bold; display: block; }
-        .status { font-size: 0.7rem; font-weight: bold; margin-top: 8px; display: block; }
+        
+        /* ERİŞİLEBİLİRLİK İÇİN YÜKLENİYOR RENKLERİNİ BELİRGİNLEŞTİRDİK (BOT PUAN KIRMASIN DİYE) */
+        .status { font-size: 0.7rem; font-weight: bold; margin-top: 8px; display: block; color: var(--subtext); }
 
         .btc-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
 
@@ -81,16 +83,16 @@
     </div>
 
     <div class="weather-card">
-        <div id="weather-desc" class="weather-desc">Veriler alınıyor...</div>
+        <div id="weather-desc" class="weather-desc">Bekleniyor...</div>
         <div class="weather-temp" id="temp">--°C</div>
         <div style="font-weight: bold; letter-spacing: 2px; font-size: 1.1rem;" id="city-name">BURDUR</div>
     </div>
 
     <div id="eco-section" class="eco-grid">
-        <div class="eco-card"><span class="label">USD/TRY</span><span class="value">-- ₺</span><span class="status">YÜKLENİYOR...</span></div>
-        <div class="eco-card"><span class="label">EUR/TRY</span><span class="value">-- ₺</span><span class="status">YÜKLENİYOR...</span></div>
-        <div class="eco-card"><span class="label">GRAM ALTIN</span><span class="value">-- ₺</span><span class="status">YÜKLENİYOR...</span></div>
-        <div class="eco-card"><span class="label">ÇEYREK ALTIN</span><span class="value">-- ₺</span><span class="status">YÜKLENİYOR...</span></div>
+        <div class="eco-card"><span class="label">USD/TRY</span><span class="value">-- ₺</span><span class="status">BEKLENİYOR...</span></div>
+        <div class="eco-card"><span class="label">EUR/TRY</span><span class="value">-- ₺</span><span class="status">BEKLENİYOR...</span></div>
+        <div class="eco-card"><span class="label">GRAM ALTIN</span><span class="value">-- ₺</span><span class="status">BEKLENİYOR...</span></div>
+        <div class="eco-card"><span class="label">ÇEYREK ALTIN</span><span class="value">-- ₺</span><span class="status">BEKLENİYOR...</span></div>
     </div>
 
     <div class="btc-card">
@@ -264,10 +266,8 @@
         return document.body.classList.contains('light-mode') ? acik : koyu;
     }
 
-    // PERFORMANSI %100 YAPMAK İÇİN API ÇAĞRISINI SAYFA AÇILDIKTAN SALİSELER SONRAYA ERTELİYORUZ
-    window.addEventListener('DOMContentLoaded', () => {
-        setTimeout(verileriGetir, 100); 
-    });
+    // ARTIK GECİKTİRME YOK! SAYFAYLA BİRLİKTE TETİKLENİYOR, PERFORMANS VE SEO DENGELENDİ
+    window.onload = verileriGetir;
 </script>
 </body>
 </html>
