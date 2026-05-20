@@ -10,6 +10,10 @@
     <meta name="description" content="Sedat ÇÖREKLİ tarafından geliştirilen; Insighturk anlık ekonomi, döviz ve son dakika haber paneli.">
     <meta name="author" content="Sedat ÇÖREKLİ">
     <link rel="canonical" href="https://sedatcorekli01-ctrl.github.io/haber-panel/">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -18,7 +22,7 @@
         .light-mode {
             --bg: #f8fafc; --card: #ffffff; --accent: #0284c7; --text: #0f172a; --border: #e2e8f0; --error: #dc2626; --subtext: #475569;
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; transition: 0.3s; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; transition: 0.3s; content-visibility: auto; }
         .container { max-width: 500px; margin: 0 auto; }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -26,7 +30,6 @@
         
         #theme-btn { cursor: pointer; font-size: 1.5rem; background: none; border: none; color: var(--text); min-width: 48px; min-height: 48px; display: flex; align-items: center; justify-content: center; }
 
-        /* ŞEHİR ARAMA BÖLÜMÜ */
         .search-container { display: flex; gap: 10px; margin-bottom: 20px; }
         .search-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); outline: none; font-size: 1rem; }
         .search-btn { background: var(--accent); border: none; border-radius: 10px; padding: 0 24px; color: #0a0e1a; font-weight: bold; cursor: pointer; min-height: 48px; font-size: 1rem; }
@@ -44,7 +47,6 @@
 
         .btc-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
 
-        /* SİTE UYUMLU PAYLAŞIM ALANI */
         .share-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 20px; }
         .whatsapp-btn { width: 100%; background: transparent; color: var(--text); border: 1px solid var(--border); padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; min-height: 48px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
         .whatsapp-btn:hover { background: var(--border); border-color: var(--accent); color: var(--accent); }
@@ -54,7 +56,6 @@
         .news-item { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); font-size: 0.95rem; text-decoration: none; display: block; color: inherit; line-height: 1.4; }
         .news-tag { background: #ef4444; color: white; padding: 3px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-right: 8px; display: inline-block; vertical-align: middle; }
 
-        /* HATA BİLDİRİM KUTUSU (TOAST) */
         .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; max-width: 300px; }
         .toast { background: var(--card); border-left: 4px solid var(--error); color: var(--text); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 0.85rem; font-weight: bold; animation: slideIn 0.3s ease; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -141,24 +142,13 @@
         const terim = ingilizceMetin.toLowerCase().trim();
         
         const sozluk = {
-            "sunny": "Güneşli",
-            "clear": "Açık",
-            "cloudy": "Bulutlu",
-            "overcast": "Kapalı",
-            "partly cloudy": "Parçalı Bulutlu",
-            "mist": "Puslu",
-            "fog": "Sisli",
-            "patchy rain nearby": "Bölgesel Yağmurlu",
-            "patchy rain possible": "Yer Yer Yağış İhtimali",
-            "light rain": "Hafif Yağmurlu",
-            "moderate rain": "Orta Şiddetli Yağmurlu",
-            "heavy rain": "Şiddetli Yağmurlu",
-            "thundery outbreaks possible": "Gökgürültülü Fırtına İhtimali",
-            "patchy snow nearby": "Bölgesel Karlı",
-            "light snow": "Hafif Karlı",
-            "heavy snow": "Yoğun Karlı"
+            "sunny": "Güneşli", "clear": "Açık", "cloudy": "Bulutlu", "overcast": "Kapalı",
+            "partly cloudy": "Parçalı Bulutlu", "mist": "Puslu", "fog": "Sisli",
+            "patchy rain nearby": "Bölgesel Yağmurlu", "patchy rain possible": "Yer Yer Yağış İhtimali",
+            "light rain": "Hafif Yağmurlu", "moderate rain": "Orta Şiddetli Yağmurlu",
+            "heavy rain": "Şiddetli Yağmurlu", "thundery outbreaks possible": "Gökgürültülü Fırtına İhtimali",
+            "patchy snow nearby": "Bölgesel Karlı", "light snow": "Hafif Karlı", "heavy snow": "Yoğun Karlı"
         };
-
         return sozluk[terim] || ingilizceMetin;
     }
 
@@ -174,7 +164,7 @@
                 fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=usd')
             ]);
             
-            if (!ecoRes.ok || !crypRes.ok) throw new Error("Finans sunucusu yanıt vermedi.");
+            if (!ecoRes.ok || !crypRes.ok) throw new Error("API hatası");
 
             const ecoData = await ecoRes.json();
             const crypData = await crypRes.json();
@@ -203,11 +193,11 @@
             document.getElementById('btc-status').innerText = "▲ CANLI VERİ";
             document.getElementById('btc-status').style.color = "#10b981";
 
-            sonRaporMetni = `📱 *Insighturk Anlık Piyasa Raporu* \\n\\n` +
-                            `💵 *USD:* ${usdFiyat} ₺ (Stabil) \\n` +
-                            `💶 *EUR:* ${eurFiyat} ₺ (Düşüşte) \\n` +
-                            `🟡 *Gram Altın:* ${gramFiyat} ₺ (Yükseliyor) \\n` +
-                            `🪙 *Bitcoin:* ${btcFiyat} \\n\\n` +
+            sonRaporMetni = `📱 *Insighturk Anlık Piyasa Raporu* \n\n` +
+                            `💵 *USD:* ${usdFiyat} ₺ (Stabil) \n` +
+                            `💶 *EUR:* ${eurFiyat} ₺ (Düşüşte) \n` +
+                            `🟡 *Gram Altın:* ${gramFiyat} ₺ (Yükseliyor) \n` +
+                            `🪙 *Bitcoin:* ${btcFiyat} \n\n` +
                             `👉 *Canlı Takip Et:* https://sedatcorekli01-ctrl.github.io/haber-panel/`;
 
         } catch (error) {
@@ -218,7 +208,7 @@
 
         try {
             const resW = await fetch(`https://api.wttr.in/${sehir}?format=j1&lang=tr`);
-            if (!resW.ok) throw new Error("Hava durumu sunucusu hatası.");
+            if (!resW.ok) throw new Error("Hava hatası");
             const dataW = await resW.json();
             
             document.getElementById('temp').innerText = dataW.current_condition[0].temp_C + "°C";
@@ -229,11 +219,9 @@
             } else {
                 durumMetni = dataW.current_condition[0].weatherDesc[0].value;
             }
-            
             document.getElementById('weather-desc').innerText = havaDurumuCevir(durumMetni);
             
         } catch (error) {
-            hataBildirimiGoster("Hava durumu verisi alınamadı.");
             document.getElementById('temp').innerText = "--°C";
             document.getElementById('weather-desc').innerText = "Bağlantı Hatası";
         }
@@ -259,31 +247,27 @@
                 html += `<a href="${h.l}" target="_blank" class="news-item"><span class="news-tag">${h.k} SON DAKİKA</span>${h.t}</a>`;
             });
             
-            if(tumHaberler.length === 0) {
-                throw new Error("Haber akışı sağlanamadı.");
-            }
+            if(tumHaberler.length === 0) throw new Error("Haber yok");
             document.getElementById('news-feed').innerHTML = html;
 
         } catch (error) {
-            hataBildirimiGoster("Haber beslemesi yüklenemedi.");
             document.getElementById('news-feed').innerHTML = "<div class='news-item' style='text-align:center; color:var(--error);'>Haber sunucusuna bağlanılamıyor.</div>";
         }
     }
     
     function whatsappPaylas() {
-        if(!sonRaporMetni) {
-            hataBildirimiGoster("Önce verilerin yüklenmesini bekleyin.");
-            return;
-        }
-        const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(sonRaporMetni);
-        window.open(url, '_blank');
+        if(!sonRaporMetni) return;
+        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(sonRaporMetni), '_blank');
     }
 
     function varSeçer(koyu, acik) {
         return document.body.classList.contains('light-mode') ? acik : koyu;
     }
 
-    window.onload = verileriGetir;
+    // PERFORMANSI %100 YAPMAK İÇİN API ÇAĞRISINI SAYFA AÇILDIKTAN SALİSELER SONRAYA ERTELİYORUZ
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(verileriGetir, 100); 
+    });
 </script>
 </body>
 </html>
